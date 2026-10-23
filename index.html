@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>A1 English Master Full Offline</title>
+<style>
+  :root {
+    --bg-main: #070707;
+    --bg-card: #121212;
+    --bg-input: #1a1a1a;
+    --yellow: #facc15;
+    --yellow-glow: rgba(250, 204, 21, 0.2);
+    --text-white: #ffffff;
+    --text-muted: #a3a3a3;
+    --border-dark: #262626;
+    --danger: #ef4444;
+    --success: #22c55e;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-white);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: #0d0d0d;
+    border-bottom: 1px solid var(--border-dark);
+    padding: 8px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .brand {
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--yellow);
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .clock-box {
+    text-align: right;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.2;
+  }
+
+  .clock-time {
+    font-weight: 800;
+    color: var(--text-white);
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* SRS BANNER */
+  .srs-banner {
+    background: linear-gradient(90deg, #422006, #713f12);
+    border-bottom: 1px solid var(--yellow);
+    padding: 8px 14px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    flex-shrink: 0;
+  }
+
+  .srs-banner.active { display: flex; }
+
+  .srs-badge {
+    background: var(--yellow);
+    color: #000;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    margin-right: 6px;
+  }
+
+  /* VIEWPORT */
+  .viewport {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .tab-pane {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tab-pane.active { display: flex; }
+
+  /* BOTTOM NAVIGATION */
+  .nav-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: #0d0d0d;
+    border-top: 1px solid var(--border-dark);
+    flex-shrink: 0;
+  }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    padding: 10px 4px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    border-top: 3px solid transparent;
+    position: relative;
+  }
+
+  .nav-btn.active {
+    color: var(--yellow);
+    border-top-color: var(--yellow);
+    background: rgba(250, 204, 21, 0.05);
+  }
+
+  .due-dot {
+    position: absolute;
+    top: 6px;
+    right: 22%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--yellow);
+    box-shadow: 0 0 8px var(--yellow);
+    display: none;
+  }
+
+  .due-dot.show { display: block; }
+
+  /* BUTTONS & PILLS */
+  .sub-nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    flex-shrink: 0;
+  }
+
+  .sub-nav::-webkit-scrollbar { height: 4px; }
+  .sub-nav::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+  .pill-btn {
+    background: var(--bg-card);
+    color: var(--text-white);
+    border: 1px solid var(--border-dark);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .pill-btn.active {
+    background: var(--yellow);
+    color: #000;
+    border-color: var(--yellow);
+  }
+
+  .pill-btn.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pill-btn.due {
+    border-color: var(--yellow);
+    box-shadow: 0 0 8px var(--yellow-glow);
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-dark);
+    border-radius: 14px;
+    padding: 15px;
+  }
+
+  .card-yellow {
+    border-color: var(--yellow);
+    box-shadow: 0 0 15px var(--yellow-glow);
+  }
+
+  .btn-primary {
+    background: var(--yellow);
+    color: #000;
+    border: none;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--yellow);
+    border: 1px solid var(--yellow);
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  /* IPA LAYOUT */
+  .ipa-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  @media (min-width: 700px) {
+    .ipa-layout { grid-template-columns: 1.15fr 1fr; }
+  }
+
+  .ipa-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(54px, 1fr));
+    gap: 6px;
+    overflow-y: auto;
+    max-height: 290px;
+  }
+
+  .ipa-cell {
+    background: #181818;
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 1rem;
+  }
+
+  .ipa-cell.active {
+    background: var(--yellow);
+    color: #000;
+    border-color: var(--yellow);
+  }
+
+  .ipa-cell small {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .ipa-cell.active small { color: #111; }
+
+  /* VOCAB FLASHCARD */
+  .flashcard-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .vocab-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px 14px;
+    position: relative;
+  }
+
+  .vocab-word {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--yellow);
+  }
+
+  .vocab-ipa {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .vocab-meaning {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 14px;
+  }
+
+  .chunk-box {
+    background: #0a0a0a;
+    border-left: 4px solid var(--yellow);
+    padding: 10px 14px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 480px;
+    text-align: left;
+  }
+
+  .chunk-en { font-size: 1.08rem; font-weight: 800; color: var(--yellow); }
+  .chunk-lit { font-size: 0.82rem; color: var(--text-muted); margin: 2px 0; }
+  .chunk-vi { font-size: 0.92rem; font-weight: 600; }
+
+  /* TIMER & QUIZ */
+  .timer-track {
+    width: 100%;
+    height: 9px;
+    background: #262626;
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 6px 0;
+  }
+
+  .timer-fill {
+    height: 100%;
+    background: var(--yellow);
+    width: 100%;
+    transition: width 0.1s linear;
+  }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .quiz-opt {
+    background: #1b1b1b;
+    border: 1px solid var(--border-dark);
+    color: var(--text-white);
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .quiz-opt:hover { border-color: var(--yellow); }
+
+  .formula-badge {
+    display: inline-block;
+    background: rgba(250, 204, 21, 0.14);
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 7px;
+    font-size: 0.88rem;
+    margin: 3px 0;
+  }
+
+  .status-tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .tag-yellow { background: var(--yellow); color: #000; }
+  .tag-green { background: var(--success); color: #000; }
+
+  .flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .text-yellow { color: var(--yellow); }
+  .text-muted { color: var(--text-muted); }
+  .fw-bold { font-weight: 800; }
+
+  /* MODAL QUẢN LÝ DỮ LIỆU */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 16px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--yellow);
+    border-radius: 14px;
+    max-width: 600px;
+    width: 100%;
+    padding: 18px;
+    max-height: 90dvh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  textarea.data-box {
+    width: 100%;
+    height: 120px;
+    background: var(--bg-input);
+    color: var(--text-white);
+    border: 1px solid var(--border-dark);
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand">⚡ A1 MASTER PRO</div>
+    <div class="header-right">
+      <button class="pill-btn" onclick="openDataModal()" style="border-color:var(--yellow); color:var(--yellow);">
+        📦 Dữ Liệu (<span id="totalWordsBadge">100</span> từ)
+      </button>
+      <div class="clock-box">
+        <div class="clock-time" id="liveClock">00:00:00</div>
+        <div id="liveDate">--/--/----</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SRS NOTIFICATION BANNER -->
+  <div class="srs-banner" id="srsBanner">
+    <div>
+      <span class="srs-badge">NHẮC ÔN TẬP</span>
+      <span id="srsMessage">Đến giờ ôn tập ngắt quãng!</span>
+    </div>
+    <button class="pill-btn active" onclick="jumpToDueReview()" style="padding: 4px 10px; font-size: 0.75rem;">Ôn ngay</button>
+  </div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="viewport">
+
+    <!-- TAB 1: IPA & PHONICS -->
+    <section class="tab-pane active" id="tab-ipa">
+      <div class="flex-between">
+        <div class="sub-nav">
+          <button class="pill-btn active" id="btnSubIpa" onclick="switchIpaMode('ipa')">44 Âm IPA (100%)</button>
+          <button class="pill-btn" id="btnSubPhonics" onclick="switchIpaMode('phonics')">7 Quy Tắc Vàng Phonics</button>
+        </div>
+        <span class="text-muted" style="font-size:0.78rem;" id="ipaProgressText">Đã luyện: 0/44 âm</span>
+      </div>
+
+      <div id="ipaSectionView" class="ipa-layout">
+        <div class="card" style="display:flex; flex-direction:column; gap:8px;">
+          <div class="sub-nav">
+            <button class="pill-btn active" onclick="filterIpaGroup('all', this)">Tất cả (44)</button>
+            <button class="pill-btn" onclick="filterIpaGroup('mono', this)">Nguyên âm đơn (12)</button>
+            <button class="pill-btn" onclick="filterIpaGroup('diph', this)">Nguyên âm đôi (8)</button>
+            <button class="pill-btn" onclick="filterIpaGroup('cons', this)">Phụ âm (24)</button>
+          </div>
+          <div class="ipa-grid" id="ipaGrid"></div>
+        </div>
+        <div class="card card-yellow" id="ipaDetailCard" style="display:flex; flex-direction:column; justify-content:space-between;"></div>
+      </div>
+
+      <div id="phonicsSectionView" style="display:none; flex-direction:column; gap:10px; flex:1;">
+        <div class="sub-nav" id="phonicsRuleNav"></div>
+        <div class="card card-yellow" id="phonicsDetailCard" style="flex:1; display:flex; flex-direction:column; justify-content:space-between;"></div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TỪ VỰNG A1 -->
+    <section class="tab-pane" id="tab-vocab">
+      <div class="flex-between">
+        <div class="sub-nav" id="vocabDayNav" style="max-width: 72%;"></div>
+        <div id="vocabSrsStatus" class="text-muted" style="font-size:0.76rem;"></div>
+      </div>
+
+      <div id="vocabStudyStage" class="flashcard-stage">
+        <div class="card card-yellow vocab-card" id="vocabCardDisplay"></div>
+        <div class="flex-between">
+          <div style="display:flex; gap:6px;">
+            <button class="btn-outline" onclick="prevVocabCard()">◀ Trước</button>
+            <button class="btn-outline" onclick="nextVocabCard()">Tiếp ▶</button>
+          </div>
+          <button class="btn-primary" id="btnStartVocabQuiz" onclick="startVocabQuiz()">
+            ⚡ Thi Phản Xạ 3 Giây
+          </button>
+        </div>
+      </div>
+
+      <div id="vocabQuizStage" class="card card-yellow" style="display:none; flex:1; flex-direction:column; justify-content:center;">
+        <div class="flex-between">
+          <span class="text-yellow fw-bold" id="vQuizProgress">Câu 1/10</span>
+          <span class="fw-bold" id="vQuizTimerText">3.0s</span>
+        </div>
+        <div class="timer-track"><div class="timer-fill" id="vQuizTimerBar"></div></div>
+        <div style="margin: 14px 0; text-align:center;">
+          <div class="text-muted" style="font-size:0.82rem;">Chọn nghĩa đúng trong 3 giây:</div>
+          <div class="vocab-word" id="vQuizPrompt" style="font-size:1.9rem; margin-top:4px;"></div>
+          <div class="vocab-ipa" id="vQuizIpa"></div>
+        </div>
+        <div class="quiz-options" id="vQuizOptions"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: 100% NGỮ PHÁP A1 (15 CHUYÊN ĐỀ) -->
+    <section class="tab-pane" id="tab-grammar">
+      <div class="flex-between">
+        <div class="sub-nav" id="grammarLessonNav" style="max-width: 72%;"></div>
+        <div id="grammarSrsStatus" class="text-muted" style="font-size:0.76rem;"></div>
+      </div>
+
+      <div id="grammarStudyStage" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px;">
+        <div class="card card-yellow" id="grammarTheoryBox"></div>
+        <div class="flex-between" style="padding-bottom:6px;">
+          <span class="text-muted" style="font-size:0.8rem;">Đúng 5/5 câu (15 giây/câu) để mở bài kế tiếp.</span>
+          <button class="btn-primary" onclick="startGrammarQuiz()">📝 Làm Bài Tập (5 Câu)</button>
+        </div>
+      </div>
+
+      <div id="grammarQuizStage" class="card card-yellow" style="display:none; flex:1; flex-direction:column; justify-content:center;">
+        <div class="flex-between">
+          <span class="text-yellow fw-bold" id="gQuizProgress">Bài tập 1/5</span>
+          <span class="fw-bold" id="gQuizTimerText">15.0s</span>
+        </div>
+        <div class="timer-track"><div class="timer-fill" id="gQuizTimerBar"></div></div>
+        <div style="margin: 12px 0;">
+          <div class="text-muted" style="font-size:0.82rem;">Chọn đáp án đúng hoàn thành mẫu câu:</div>
+          <div id="gQuizPrompt" style="font-size:1.2rem; font-weight:800; color:var(--yellow); margin-top:6px;"></div>
+          <div id="gQuizHint" class="text-muted" style="font-size:0.85rem; margin-top:4px;"></div>
+        </div>
+        <div class="quiz-options" id="gQuizOptions"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: LUYỆN SPEAKING PHẢN XẠ -->
+    <section class="tab-pane" id="tab-speaking">
+      <div class="flex-between">
+        <div class="sub-nav">
+          <button class="pill-btn active" id="spkFilterLearned" onclick="setSpeakingPool('learned')">Mẫu câu đã học</button>
+          <button class="pill-btn" id="spkFilterAll" onclick="setSpeakingPool('all')">Toàn bộ mẫu câu</button>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="text-muted" style="font-size:0.8rem;" id="speakingCountInfo">0 mẫu câu</span>
+          <button class="btn-primary" id="btnToggleSpeaking" onclick="toggleSpeakingLoop()" style="padding:7px 12px; font-size:0.82rem;">
+            ▶ Bắt Đầu Tự Động
+          </button>
+        </div>
+      </div>
+
+      <div class="card card-yellow" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:18px;">
+        <div class="status-tag tag-yellow" id="spkPhaseTag">SẴN SÀNG PHẢN XẠ</div>
+        <div id="spkMainDisplay" style="max-width:540px; width:100%; margin: 12px 0;">
+          <p style="font-size:1.05rem; color:var(--text-muted); line-height:1.5;">
+            Bấm <b>"Bắt Đầu Tự Động"</b>: Hệ thống gọi âm thanh $\rightarrow$ <b>Đếm ngược 5 giây</b> để bạn phản xạ nói $\rightarrow$ <b>Lật kết quả giữ 5 giây</b> $\rightarrow$ Tự động chuyển câu tiếp theo.
+          </p>
+        </div>
+        <div style="font-size:2.5rem; font-weight:900; color:var(--yellow); margin:6px 0;" id="spkCountdownNumber">--</div>
+        <div class="timer-track" style="max-width:400px;"><div class="timer-fill" id="spkTimerBar" style="width:0%;"></div></div>
+        <div style="margin-top:12px; display:flex; gap:10px;">
+          <button class="btn-outline" onclick="replayCurrentSpeakingAudio()">🔊 Nghe lại</button>
+          <button class="btn-outline" onclick="skipToNextSpeakingCard()">⏭ Câu kế tiếp</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM 4 TABS -->
+  <nav class="nav-tabs">
+    <button class="nav-btn active" onclick="switchMainTab('ipa', this)">
+      <span>🔤</span><span>1. IPA & Phonics</span>
+    </button>
+    <button class="nav-btn" onclick="switchMainTab('vocab', this)">
+      <span class="due-dot" id="dotVocab"></span>
+      <span>🗂️</span><span>2. Từ Vựng</span>
+    </button>
+    <button class="nav-btn" onclick="switchMainTab('grammar', this)">
+      <span class="due-dot" id="dotGrammar"></span>
+      <span>📐</span><span>3. Ngữ Pháp (15)</span>
+    </button>
+    <button class="nav-btn" onclick="switchMainTab('speaking', this)">
+      <span>🎙️</span><span>4. Speaking</span>
+    </button>
+  </nav>
+
+  <!-- MODAL NẠP GÓI TỪ VỰNG OFFLINE & SAO LƯU -->
+  <div class="modal-overlay" id="dataModal">
+    <div class="modal-card">
+      <div class="flex-between">
+        <h3 class="text-yellow">📦 Quản Lý Kho Dữ Liệu Offline</h3>
+        <button class="pill-btn" onclick="closeDataModal()">✕ Đóng</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.4;">
+        Hiện tại App đang có <b class="text-yellow" id="modalWordCount">100</b> từ vựng (<span id="modalDayCount">10</span> ngày) và <b class="text-yellow">15/15</b> bài Ngữ pháp A1. Bạn có thể dán gói JSON từ vựng mới vào ô dưới đây để mở rộng lên đủ 1.000 từ Offline:
+      </p>
+      <textarea class="data-box" id="jsonImportBox" placeholder='Dán mã JSON gói từ vựng (Ngày 11 -> 100) vào đây...'></textarea>
+      <div class="flex-between">
+        <button class="btn-primary" onclick="importVocabPack()">➕ Nạp Gói Từ Vựng Vào Máy</button>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-outline" onclick="exportBackup()">⬇ Sao lưu tiến độ</button>
+          <button class="btn-outline" onclick="importBackup()">⬆ Khôi phục</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ============================================================================
+   PHẦN 1: TRỌN BỘ 44 ÂM IPA & 7 QUY TẮC VÀNG PHONICS (100% ĐẦY ĐỦ)
+   ============================================================================ */
+const IPA_DATA = [
+  { s: "/iː/", g: "mono", name: "Nguyên âm đơn dài", mouth: "Miệng căng sang hai bên như đang mỉm cười, lưỡi nâng cao, ngân dài âm i.", ex: "see, green, meet", chunk: "meet my friend", lit: "gặp - của tôi - bạn", vi: "gặp bạn của tôi" },
+  { s: "/ɪ/", g: "mono", name: "Nguyên âm đơn ngắn", mouth: "Miệng mở hờ tự nhiên, phát âm ngắn, gọn và dứt khoát giữa i và ê.", ex: "sit, big, live", chunk: "live in peace", lit: "sống - trong - bình yên", vi: "sống trong bình yên" },
+  { s: "/ʊ/", g: "mono", name: "Nguyên âm đơn ngắn", mouth: "Môi hơi tròn đẩy nhẹ về trước, phát âm ngắn dứt khoát giữa u và ư.", ex: "good, book, look", chunk: "read a book", lit: "đọc - một - cuốn sách", vi: "đọc một cuốn sách" },
+  { s: "/uː/", g: "mono", name: "Nguyên âm đơn dài", mouth: "Môi chu tròn nhỏ, đẩy về phía trước, ngân dài âm u rõ ràng.", ex: "food, blue, school", chunk: "cook good food", lit: "nấu - ngon - đồ ăn", vi: "nấu đồ ăn ngon" },
+  { s: "/e/", g: "mono", name: "Nguyên âm đơn ngắn", mouth: "Miệng mở vừa phải sang hai bên, lưỡi đặt giữa miệng, phát âm e ngắn.", ex: "bed, pen, ten", chunk: "go to bed", lit: "đi - tới - giường", vi: "đi ngủ" },
+  { s: "/ə/", g: "mono", name: "Âm lướt (Schwa)", mouth: "Môi và lưỡi thả lỏng hoàn toàn, phát âm ơ cực nhẹ và ngắn.", ex: "about, teacher, today", chunk: "wait a minute", lit: "đợi - một - phút", vi: "đợi một chút" },
+  { s: "/ɜː/", g: "mono", name: "Nguyên âm đơn dài", mouth: "Môi hơi mở, lưỡi cong nhẹ lên chạm gần vòm miệng trên, ngân dài âm ơ.", ex: "work, bird, learn", chunk: "learn new words", lit: "học - mới - những từ", vi: "học những từ mới" },
+  { s: "/ɔː/", g: "mono", name: "Nguyên âm đơn dài", mouth: "Môi tròn, hạ nhẹ hàm dưới, ngân dài âm o sâu trong khoang miệng.", ex: "call, morning, door", chunk: "open the door", lit: "mở - cánh - cửa", vi: "mở cửa ra" },
+  { s: "/æ/", g: "mono", name: "Âm e bẹt", mouth: "Há miệng rộng vừa phải, kéo khóe miệng sang hai bên, phát âm pha giữa a và e.", ex: "cat, happy, family", chunk: "a happy family", lit: "một - hạnh phúc - gia đình", vi: "một gia đình hạnh phúc" },
+  { s: "/ʌ/", g: "mono", name: "Nguyên âm đơn ngắn", mouth: "Miệng mở tự nhiên, lưỡi hạ thấp ở giữa, bật âm ă ngắn gọn.", ex: "cup, sun, love", chunk: "cup of coffee", lit: "tách - của - cà phê", vi: "một tách cà phê" },
+  { s: "/ɑː/", g: "mono", name: "Nguyên âm đơn dài", mouth: "Há miệng rộng thoải mái, hạ thấp lưỡi, ngân dài âm a sâu.", ex: "car, start, father", chunk: "start the car", lit: "khởi động - chiếc - xe", vi: "khởi động chiếc xe" },
+  { s: "/ɒ/", g: "mono", name: "Nguyên âm đơn ngắn", mouth: "Hơi tròn môi, hạ hàm dưới nhanh, phát âm o ngắn dứt khoát.", ex: "hot, clock, coffee", chunk: "drink hot coffee", lit: "uống - nóng - cà phê", vi: "uống cà phê nóng" },
+  { s: "/ɪə/", g: "diph", name: "Nguyên âm đôi", mouth: "Bắt đầu bằng âm /ɪ/ rồi lướt nhanh và mượt về âm /ə/.", ex: "here, near, clear", chunk: "sit right here", lit: "ngồi - ngay - tại đây", vi: "ngồi ngay tại đây" },
+  { s: "/eɪ/", g: "diph", name: "Nguyên âm đôi", mouth: "Phát âm /e/ trước rồi khép dần miệng lướt lên âm /ɪ/.", ex: "day, make, late", chunk: "make a cake", lit: "làm - một - chiếc bánh", vi: "làm một chiếc bánh" },
+  { s: "/ʊə/", g: "diph", name: "Nguyên âm đôi", mouth: "Chu môi đọc âm /ʊ/ rồi thả lỏng môi lướt về âm /ə/.", ex: "sure, tour, poor", chunk: "know for sure", lit: "biết - cho - chắc chắn", vi: "biết chắc chắn" },
+  { s: "/ɔɪ/", g: "diph", name: "Nguyên âm đôi", mouth: "Tròn môi phát âm /ɔː/ rồi kéo khóe miệng sang hai bên về /ɪ/.", ex: "boy, voice, join", chunk: "join the game", lit: "tham gia - trò - chơi", vi: "tham gia trò chơi" },
+  { s: "/əʊ/", g: "diph", name: "Nguyên âm đôi", mouth: "Mở miệng nhẹ ở âm /ə/ rồi thu tròn môi về âm /ʊ/.", ex: "go, home, open", chunk: "go back home", lit: "đi - quay lại - nhà", vi: "đi về nhà" },
+  { s: "/eə/", g: "diph", name: "Nguyên âm đôi", mouth: "Mở miệng đọc âm /e/ rồi thả lỏng lướt nhẹ vào âm /ə/.", ex: "care, share, where", chunk: "share with me", lit: "chia sẻ - với - tôi", vi: "chia sẻ với tôi" },
+  { s: "/aɪ/", g: "diph", name: "Nguyên âm đôi", mouth: "Há rộng miệng đọc âm /a/ rồi nâng lưỡi khép dần về /ɪ/.", ex: "time, night, buy", chunk: "buy some fruit", lit: "mua - một ít - trái cây", vi: "mua một ít trái cây" },
+  { s: "/aʊ/", g: "diph", name: "Nguyên âm đôi", mouth: "Mở rộng miệng đọc âm /a/ rồi chu tròn môi về âm /ʊ/.", ex: "now, house, out", chunk: "clean the house", lit: "dọn - ngôi - nhà", vi: "dọn dẹp ngôi nhà" },
+  { s: "/p/", g: "cons", name: "Phụ âm vô thanh", mouth: "Mím hai môi giữ hơi, bật mạnh hơi ra ngoài, dây thanh quản không rung.", ex: "pen, pay, put", chunk: "pay the bill", lit: "trả - tờ - hóa đơn", vi: "thanh toán hóa đơn" },
+  { s: "/b/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Mím hai môi rồi bật ra, dây thanh quản ở cổ họng rung rõ.", ex: "bag, buy, best", chunk: "buy a bag", lit: "mua - một - chiếc túi", vi: "mua một chiếc túi" },
+  { s: "/t/", g: "cons", name: "Phụ âm vô thanh", mouth: "Đầu lưỡi chạm nướu răng trên, bật hơi sắc gọn ra ngoài, không rung họng.", ex: "tea, take, time", chunk: "take your time", lit: "lấy - của bạn - thời gian", vi: "cứ từ từ thong thả" },
+  { s: "/d/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Đầu lưỡi chạm nướu răng trên rồi bật ra, cổ họng rung.", ex: "day, do, drink", chunk: "drink cold water", lit: "uống - lạnh - nước", vi: "uống nước lạnh" },
+  { s: "/tʃ/", g: "cons", name: "Phụ âm vô thanh", mouth: "Môi hơi chu về trước, lưỡi chạm vòm miệng, bật hơi mạnh không rung họng.", ex: "check, chair, lunch", chunk: "eat hot lunch", lit: "ăn - nóng - bữa trưa", vi: "ăn bữa trưa nóng" },
+  { s: "/dʒ/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Khẩu hình giống âm /tʃ/ nhưng làm rung dây thanh quản ở cổ họng.", ex: "job, juice, page", chunk: "fresh orange juice", lit: "tươi - cam - nước ép", vi: "nước cam tươi" },
+  { s: "/k/", g: "cons", name: "Phụ âm vô thanh", mouth: "Nâng cuống lưỡi chạm vòm họng sau rồi bật hơi mạnh ra ngoài, không rung.", ex: "key, keep, cook", chunk: "keep the key", lit: "giữ - chiếc - chìa khóa", vi: "giữ chiếc chìa khóa" },
+  { s: "/g/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Khẩu hình giống âm /k/ nhưng làm rung dây thanh quản khi bật âm.", ex: "go, give, game", chunk: "give me time", lit: "cho - tôi - thời gian", vi: "cho tôi thời gian" },
+  { s: "/f/", g: "cons", name: "Phụ âm vô thanh", mouth: "Hàm răng trên chạm nhẹ môi dưới, thổi hơi đều ra ngoài, không rung họng.", ex: "fine, fast, phone", chunk: "walk very fast", lit: "đi bộ - rất - nhanh", vi: "đi bộ rất nhanh" },
+  { s: "/v/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Răng trên chạm môi dưới giống âm /f/, đẩy hơi làm rung dây thanh quản.", ex: "very, visit, voice", chunk: "visit my mother", lit: "thăm - của tôi - mẹ", vi: "thăm mẹ của tôi" },
+  { s: "/θ/", g: "cons", name: "Phụ âm vô thanh", mouth: "Đặt đầu lưỡi nhẹ giữa hai hàm răng, thổi luồng hơi ra ngoài, không rung.", ex: "think, thank, three", chunk: "thank you very much", lit: "cảm ơn - bạn - rất - nhiều", vi: "cảm ơn bạn rất nhiều" },
+  { s: "/ð/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Đặt đầu lưỡi giữa hai hàm răng và làm rung dây thanh quản.", ex: "this, that, mother", chunk: "read this book", lit: "đọc - cuốn này - sách", vi: "đọc cuốn sách này" },
+  { s: "/s/", g: "cons", name: "Phụ âm vô thanh", mouth: "Hai hàm răng khép gần nhau, đầu lưỡi gần răng cửa, xì hơi nhẹ tự nhiên.", ex: "see, sun, soon", chunk: "see you soon", lit: "gặp - bạn - sớm", vi: "hẹn gặp lại sớm" },
+  { s: "/z/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Khẩu hình giống âm /s/ nhưng làm rung thanh quản tạo âm như tiếng ong kêu.", ex: "zoo, easy, busy", chunk: "a busy day", lit: "một - bận rộn - ngày", vi: "một ngày bận rộn" },
+  { s: "/ʃ/", g: "cons", name: "Phụ âm vô thanh", mouth: "Chu môi về phía trước, nâng lưỡi nhẹ, thổi hơi mạnh như khi ra hiệu 'suỵt'.", ex: "she, shop, wash", chunk: "wash my hands", lit: "rửa - của tôi - đôi tay", vi: "rửa tay của tôi" },
+  { s: "/ʒ/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Chu môi giống âm /ʃ/ nhưng giữ rung dây thanh quản ở cổ họng.", ex: "usually, vision, decision", chunk: "make a decision", lit: "tạo - một - quyết định", vi: "đưa ra quyết định" },
+  { s: "/m/", g: "cons", name: "Phụ âm mũi", mouth: "Ngậm hai môi lại, luồng hơi đi qua mũi và làm rung thanh quản.", ex: "money, morning, name", chunk: "my full name", lit: "của tôi - đầy đủ - tên", vi: "họ tên đầy đủ của tôi" },
+  { s: "/n/", g: "cons", name: "Phụ âm mũi", mouth: "Miệng hé nhẹ, đầu lưỡi chạm nướu răng trên, đẩy hơi qua mũi.", ex: "nice, need, night", chunk: "need some help", lit: "cần - một ít - giúp đỡ", vi: "cần một chút giúp đỡ" },
+  { s: "/ŋ/", g: "cons", name: "Phụ âm mũi", mouth: "Nâng cuống lưỡi chạm vòm họng sau (giống âm 'ng'), hơi thoát qua mũi.", ex: "sing, morning, long", chunk: "sing a song", lit: "hát - một - bài hát", vi: "hát một bài hát" },
+  { s: "/h/", g: "cons", name: "Phụ âm vô thanh", mouth: "Miệng mở tự nhiên, thở nhẹ một luồng hơi từ họng ra ngoài như hà hơi.", ex: "home, help, happy", chunk: "help my friend", lit: "giúp - của tôi - bạn", vi: "giúp bạn của tôi" },
+  { s: "/l/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Đầu lưỡi cong lên chạm vào chân răng cửa hàm trên, rung cổ họng.", ex: "like, look, life", chunk: "love my life", lit: "yêu - của tôi - cuộc sống", vi: "yêu cuộc sống của tôi" },
+  { s: "/r/", g: "cons", name: "Phụ âm hữu thanh", mouth: "Môi hơi chu tròn, đầu lưỡi cong ngược vào trong mà không chạm vòm miệng.", ex: "red, run, rain", chunk: "run every morning", lit: "chạy - mỗi - buổi sáng", vi: "chạy bộ mỗi sáng" },
+  { s: "/w/", g: "cons", name: "Bán nguyên âm", mouth: "Tròn nhỏ hai môi như phát âm /u/ rồi mở rộng nhanh sang nguyên âm đứng sau.", ex: "water, work, wait", chunk: "wait for me", lit: "đợi - cho - tôi", vi: "đợi tôi với" },
+  { s: "/j/", g: "cons", name: "Bán nguyên âm", mouth: "Nâng thân lưỡi gần vòm miệng như âm /i/ rồi trượt nhanh sang nguyên âm kế tiếp.", ex: "yes, you, young", chunk: "see you tomorrow", lit: "gặp - bạn - ngày mai", vi: "hẹn gặp bạn ngày mai" }
+];
+
+const PHONICS_RULES = [
+  { id: 1, title: "Quy tắc 1: Âm E câm ở cuối từ (Magic E)", rule: "Khi một từ ngắn có cấu trúc [Nguyên âm + Phụ âm + E] ở cuối, chữ 'E' sẽ câm và nguyên âm đứng trước đọc theo tên bảng chữ cái (a->/eɪ/, i->/aɪ/, o->/əʊ/, u->/juː/).", examples: "make (/meɪk/), time (/taɪm/), home (/həʊm/), cute (/kjuːt/)", chunk: "make a cake", lit: "làm - một - chiếc bánh", vi: "làm một chiếc bánh" },
+  { id: 2, title: "Quy tắc 2: Âm tiết đóng CVC (Nguyên âm ngắn)", rule: "Khi một nguyên âm đơn nằm kẹp giữa hai phụ âm (C-V-C) và không có E ở cuối, nguyên âm đó luôn đọc thành âm ngắn (/æ/, /e/, /ɪ/, /ɒ/, /ʌ/).", examples: "cat (/kæt/), bed (/bed/), sit (/sɪt/), hot (/hɒt/), cup (/kʌp/)", chunk: "sit on bed", lit: "ngồi - trên - giường", vi: "ngồi trên giường" },
+  { id: 3, title: "Quy tắc 3: Hai nguyên âm đi cùng nhau", rule: "Khi hai nguyên âm đứng sát nhau (ee, ea, ai, ay, oa), nguyên âm đầu đọc dài theo tên chữ cái và nguyên âm thứ hai câm.", examples: "meet (/miːt/), read (/riːd/), rain (/reɪn/), day (/deɪ/), boat (/bəʊt/)", chunk: "read a book", lit: "đọc - một - cuốn sách", vi: "đọc một cuốn sách" },
+  { id: 4, title: "Quy tắc 4: Phụ âm R kiểm soát nguyên âm (Bossy R)", rule: "Khi chữ 'R' đứng ngay sau nguyên âm (ar, er, ir, or, ur), nó làm thay đổi âm của nguyên âm và kéo dài âm.", examples: "car (/kɑː/), her (/hɜː/), bird (/bɜːd/), morning (/ˈmɔːnɪŋ/)", chunk: "park the car", lit: "đỗ - chiếc - xe hơi", vi: "đỗ chiếc xe hơi" },
+  { id: 5, title: "Quy tắc 5: Chữ C và G mềm khi gặp E, I, Y", rule: "Đứng trước E, I, Y thì chữ C đổi từ /k/ sang /s/ (city, face) và chữ G thường đổi từ /g/ sang /dʒ/ (page, gym).", examples: "city (/ˈsɪti/), face (/feɪs/), page (/peɪdʒ/), gym (/dʒɪm/)", chunk: "big nice city", lit: "lớn - đẹp - thành phố", vi: "thành phố lớn và đẹp" },
+  { id: 6, title: "Quy tắc 6: Tổ hợp phụ âm ghép (Digraphs)", rule: "Hai phụ âm ghép lại tạo âm mới: SH -> /ʃ/, CH -> /tʃ/, PH -> /f/, TH -> /θ/ hoặc /ð/, CK -> /k/.", examples: "shop (/ʃɒp/), lunch (/lʌntʃ/), phone (/fəʊn/), think (/θɪŋk/)", chunk: "check my phone", lit: "kiểm tra - của tôi - điện thoại", vi: "kiểm tra điện thoại của tôi" },
+  { id: 7, title: "Quy tắc 7: Phát âm đuôi -S/-ES và -ED", rule: "• -S/ES: /ɪz/ sau s, x, z, ch, sh; /s/ sau p, k, t, f; còn lại là /z/.\n• -ED: /ɪd/ sau t, d; /t/ sau p, k, f, s, ch, sh; còn lại là /d/.", examples: "works (/wɜːks/), plays (/pleɪz/), watches (/ˈwɒtʃɪz/), wanted (/ˈwɒntɪd/)", chunk: "watches TV shows", lit: "xem - truyền hình - chương trình", vi: "xem các chương trình TV" }
+];
+
+/* ============================================================================
+   PHẦN 2: 100 TỪ VỰNG A1 ĐẦU TIÊN (NGÀY 1 -> NGÀY 10, MỖI NGÀY 10 THẺ)
+   ============================================================================ */
+const DEFAULT_VOCAB_DAYS = [
+  { day: 1, title: "Ngày 1: Sinh Hoạt Hàng Ngày", words: [
+    { w: "wake", ipa: "/weɪk/", vi: "thức dậy", chunk: "wake up early", lit: "thức - dậy - sớm", chunkVi: "thức dậy sớm" },
+    { w: "brush", ipa: "/brʌʃ/", vi: "chải / đánh", chunk: "brush my teeth", lit: "chải - của tôi - răng", chunkVi: "đánh răng của tôi" },
+    { w: "wash", ipa: "/wɒʃ/", vi: "rửa / giặt", chunk: "wash my face", lit: "rửa - của tôi - mặt", chunkVi: "rửa mặt của tôi" },
+    { w: "breakfast", ipa: "/ˈbrekfəst/", vi: "bữa sáng", chunk: "eat hot breakfast", lit: "ăn - nóng - bữa sáng", chunkVi: "ăn bữa sáng nóng" },
+    { w: "drink", ipa: "/drɪŋk/", vi: "uống", chunk: "drink black coffee", lit: "uống - đen - cà phê", chunkVi: "uống cà phê đen" },
+    { w: "leave", ipa: "/liːv/", vi: "rời khỏi", chunk: "leave the house", lit: "rời khỏi - ngôi - nhà", chunkVi: "rời khỏi nhà" },
+    { w: "start", ipa: "/stɑːt/", vi: "bắt đầu", chunk: "start my work", lit: "bắt đầu - của tôi - việc", chunkVi: "bắt đầu công việc" },
+    { w: "lunch", ipa: "/lʌntʃ/", vi: "bữa trưa", chunk: "have lunch together", lit: "ăn - bữa trưa - cùng nhau", chunkVi: "ăn trưa cùng nhau" },
+    { w: "dinner", ipa: "/ˈdɪnə/", vi: "bữa tối", chunk: "cook family dinner", lit: "nấu - gia đình - bữa tối", chunkVi: "nấu bữa tối gia đình" },
+    { w: "sleep", ipa: "/sliːp/", vi: "ngủ", chunk: "sleep very well", lit: "ngủ - rất - ngon", chunkVi: "ngủ rất ngon" }
+  ]},
+  { day: 2, title: "Ngày 2: Gia Đình & Nhà Cửa", words: [
+    { w: "family", ipa: "/ˈfæməli/", vi: "gia đình", chunk: "love my family", lit: "yêu - của tôi - gia đình", chunkVi: "yêu gia đình tôi" },
+    { w: "mother", ipa: "/ˈmʌðə/", vi: "mẹ", chunk: "help my mother", lit: "giúp - của tôi - mẹ", chunkVi: "giúp mẹ của tôi" },
+    { w: "father", ipa: "/ˈfɑːðə/", vi: "bố / cha", chunk: "call my father", lit: "gọi - của tôi - bố", chunkVi: "gọi cho bố tôi" },
+    { w: "house", ipa: "/haʊs/", vi: "ngôi nhà", chunk: "clean the house", lit: "dọn - ngôi - nhà", chunkVi: "dọn dẹp ngôi nhà" },
+    { w: "kitchen", ipa: "/ˈkɪtʃɪn/", vi: "nhà bếp", chunk: "in the kitchen", lit: "ở trong - nhà - bếp", chunkVi: "ở trong nhà bếp" },
+    { w: "room", ipa: "/ruːm/", vi: "căn phòng", chunk: "a small room", lit: "một - nhỏ - căn phòng", chunkVi: "một căn phòng nhỏ" },
+    { w: "door", ipa: "/dɔː/", vi: "cánh cửa", chunk: "close the door", lit: "đóng - cánh - cửa", chunkVi: "đóng cửa lại" },
+    { w: "window", ipa: "/ˈwɪndəʊ/", vi: "cửa sổ", chunk: "open the window", lit: "mở - chiếc - cửa sổ", chunkVi: "mở cửa sổ ra" },
+    { w: "table", ipa: "/ˈteɪbl/", vi: "cái bàn", chunk: "on the table", lit: "ở trên - cái - bàn", chunkVi: "ở trên bàn" },
+    { w: "chair", ipa: "/tʃeə/", vi: "cái ghế", chunk: "sit on chair", lit: "ngồi - trên - ghế", chunkVi: "ngồi trên ghế" }
+  ]},
+  { day: 3, title: "Ngày 3: Ẩm Thực & Mua Sắm", words: [
+    { w: "water", ipa: "/ˈwɔːtə/", vi: "nước", chunk: "drink cold water", lit: "uống - lạnh - nước", chunkVi: "uống nước lạnh" },
+    { w: "rice", ipa: "/raɪs/", vi: "cơm / gạo", chunk: "eat white rice", lit: "ăn - trắng - cơm", chunkVi: "ăn cơm trắng" },
+    { w: "meat", ipa: "/miːt/", vi: "thịt", chunk: "buy fresh meat", lit: "mua - tươi - thịt", chunkVi: "mua thịt tươi" },
+    { w: "fish", ipa: "/fɪʃ/", vi: "cá", chunk: "fry the fish", lit: "chiên - con - cá", chunkVi: "chiên cá" },
+    { w: "fruit", ipa: "/fruːt/", vi: "trái cây", chunk: "wash fresh fruit", lit: "rửa - tươi - trái cây", chunkVi: "rửa trái cây tươi" },
+    { w: "money", ipa: "/ˈmʌni/", vi: "tiền", chunk: "save my money", lit: "tiết kiệm - của tôi - tiền", chunkVi: "tiết kiệm tiền của tôi" },
+    { w: "price", ipa: "/praɪs/", vi: "giá cả", chunk: "a good price", lit: "một - tốt - mức giá", chunkVi: "một mức giá tốt" },
+    { w: "cheap", ipa: "/tʃiːp/", vi: "rẻ", chunk: "very cheap food", lit: "rất - rẻ - đồ ăn", chunkVi: "đồ ăn rất rẻ" },
+    { w: "expensive", ipa: "/ɪkˈspensɪv/", vi: "đắt đỏ", chunk: "too expensive now", lit: "quá - đắt - bây giờ", chunkVi: "bây giờ đắt quá" },
+    { w: "pay", ipa: "/peɪ/", vi: "thanh toán", chunk: "pay by cash", lit: "trả - bằng - tiền mặt", chunkVi: "trả bằng tiền mặt" }
+  ]},
+  { day: 4, title: "Ngày 4: Thời Gian & Thời Tiết", words: [
+    { w: "morning", ipa: "/ˈmɔːnɪŋ/", vi: "buổi sáng", chunk: "every early morning", lit: "mỗi - sớm - buổi sáng", chunkVi: "mỗi buổi sáng sớm" },
+    { w: "afternoon", ipa: "/ˌɑːftəˈnuːn/", vi: "buổi chiều", chunk: "free this afternoon", lit: "rảnh - này - buổi chiều", chunkVi: "rảnh chiều nay" },
+    { w: "evening", ipa: "/ˈiːvnɪŋ/", vi: "buổi tối", chunk: "in the evening", lit: "vào - buổi - tối", chunkVi: "vào buổi tối" },
+    { w: "today", ipa: "/təˈdeɪ/", vi: "hôm nay", chunk: "work hard today", lit: "làm việc - chăm chỉ - hôm nay", chunkVi: "hôm nay làm việc chăm chỉ" },
+    { w: "tomorrow", ipa: "/təˈmɒrəʊ/", vi: "ngày mai", chunk: "call me tomorrow", lit: "gọi - tôi - ngày mai", chunkVi: "ngày mai gọi cho tôi" },
+    { w: "sunny", ipa: "/ˈsʌni/", vi: "có nắng", chunk: "a sunny day", lit: "một - nắng - ngày", chunkVi: "một ngày nắng đẹp" },
+    { w: "rain", ipa: "/reɪn/", vi: "cơn mưa", chunk: "heavy rain outside", lit: "nặng hạt - mưa - bên ngoài", chunkVi: "bên ngoài mưa to" },
+    { w: "hot", ipa: "/hɒt/", vi: "nóng", chunk: "hot summer weather", lit: "nóng - mùa hè - thời tiết", chunkVi: "thời tiết mùa hè nóng" },
+    { w: "cold", ipa: "/kəʊld/", vi: "lạnh", chunk: "cold winter wind", lit: "lạnh - mùa đông - gió", chunkVi: "gió mùa đông lạnh" },
+    { w: "hour", ipa: "/ˈaʊə/", vi: "giờ đồng hồ", chunk: "wait one hour", lit: "đợi - một - giờ", chunkVi: "đợi một tiếng đồng hồ" }
+  ]},
+  { day: 5, title: "Ngày 5: Di Chuyển & Đời Sống", words: [
+    { w: "street", ipa: "/striːt/", vi: "đường phố", chunk: "walk down street", lit: "đi bộ - dọc - con phố", chunkVi: "đi bộ dọc con phố" },
+    { w: "turn", ipa: "/tɜːn/", vi: "rẽ / quay", chunk: "turn right here", lit: "rẽ - phải - ở đây", chunkVi: "rẽ phải ở đây" },
+    { w: "near", ipa: "/nɪə/", vi: "gần", chunk: "near my house", lit: "gần - của tôi - nhà", chunkVi: "gần nhà của tôi" },
+    { w: "far", ipa: "/fɑː/", vi: "xa", chunk: "far from here", lit: "xa - từ - đây", chunkVi: "xa khỏi nơi này" },
+    { w: "ride", ipa: "/raɪd/", vi: "chạy (xe 2 bánh)", chunk: "ride my bike", lit: "chạy - của tôi - xe", chunkVi: "chạy xe của tôi" },
+    { w: "drive", ipa: "/draɪv/", vi: "lái (ô tô)", chunk: "drive very carefully", lit: "lái xe - rất - cẩn thận", chunkVi: "lái xe rất cẩn thận" },
+    { w: "fast", ipa: "/fɑːst/", vi: "nhanh", chunk: "go too fast", lit: "đi - quá - nhanh", chunkVi: "đi quá nhanh" },
+    { w: "slow", ipa: "/sləʊ/", vi: "chậm", chunk: "speak more slowly", lit: "nói - hơn - chậm rãi", chunkVi: "nói chậm hơn" },
+    { w: "stop", ipa: "/stɒp/", vi: "dừng lại", chunk: "stop right there", lit: "dừng - ngay - đằng kia", chunkVi: "dừng lại ngay đằng kia" },
+    { w: "help", ipa: "/help/", vi: "giúp đỡ", chunk: "can you help", lit: "có thể - bạn - giúp", chunkVi: "bạn giúp được không" }
+  ]},
+  { day: 6, title: "Ngày 6: Con Người & Cảm Xúc", words: [
+    { w: "friend", ipa: "/frend/", vi: "người bạn", chunk: "my best friend", lit: "của tôi - tốt nhất - bạn", chunkVi: "bạn thân nhất của tôi" },
+    { w: "child", ipa: "/tʃaɪld/", vi: "đứa trẻ", chunk: "a happy child", lit: "một - vui vẻ - đứa trẻ", chunkVi: "một đứa trẻ vui vẻ" },
+    { w: "man", ipa: "/mæn/", vi: "người đàn ông", chunk: "a young man", lit: "một - trẻ - đàn ông", chunkVi: "một người đàn ông trẻ" },
+    { w: "woman", ipa: "/ˈwʊmən/", vi: "người phụ nữ", chunk: "a kind woman", lit: "một - tốt bụng - phụ nữ", chunkVi: "một phụ nữ tốt bụng" },
+    { w: "happy", ipa: "/ˈhæpi/", vi: "vui vẻ / hạnh phúc", chunk: "feel very happy", lit: "cảm thấy - rất - vui", chunkVi: "cảm thấy rất vui" },
+    { w: "sad", ipa: "/sæd/", vi: "buồn", chunk: "look so sad", lit: "trông - quá - buồn", chunkVi: "trông buồn quá" },
+    { w: "tired", ipa: "/ˈtaɪəd/", vi: "mệt mỏi", chunk: "feel a bit tired", lit: "thấy - một chút - mệt", chunkVi: "thấy hơi mệt một chút" },
+    { w: "angry", ipa: "/ˈæŋɡri/", vi: "tức giận", chunk: "get angry easily", lit: "trở nên - giận - dễ dàng", chunkVi: "dễ nổi giận" },
+    { w: "hungry", ipa: "/ˈhʌŋɡri/", vi: "đói bụng", chunk: "very hungry now", lit: "rất - đói - bây giờ", chunkVi: "bây giờ rất đói bụng" },
+    { w: "thirsty", ipa: "/ˈθɜːsti/", vi: "khát nước", chunk: "feel so thirsty", lit: "cảm thấy - quá - khát", chunkVi: "cảm thấy khát nước quá" }
+  ]},
+  { day: 7, title: "Ngày 7: Cơ Thể & Sức Khỏe", words: [
+    { w: "head", ipa: "/hed/", vi: "cái đầu", chunk: "shake my head", lit: "lắc - của tôi - đầu", chunkVi: "lắc đầu của tôi" },
+    { w: "eye", ipa: "/aɪ/", vi: "đôi mắt", chunk: "close your eyes", lit: "nhắm - của bạn - mắt", chunkVi: "nhắm mắt của bạn lại" },
+    { w: "hand", ipa: "/hænd/", vi: "bàn tay", chunk: "raise your hand", lit: "giơ - của bạn - tay", chunkVi: "giơ tay của bạn lên" },
+    { w: "leg", ipa: "/leɡ/", vi: "đôi chân", chunk: "walk on legs", lit: "đi - trên - đôi chân", chunkVi: "đi trên đôi chân" },
+    { w: "heart", ipa: "/hɑːt/", vi: "trái tim", chunk: "from my heart", lit: "từ - của tôi - trái tim", chunkVi: "từ tận đáy lòng tôi" },
+    { w: "sick", ipa: "/sɪk/", vi: "ốm / bệnh", chunk: "feel sick today", lit: "thấy - ốm - hôm nay", chunkVi: "hôm nay thấy bị ốm" },
+    { w: "doctor", ipa: "/ˈdɒktə/", vi: "bác sĩ", chunk: "see a doctor", lit: "gặp - một - bác sĩ", chunkVi: "đi khám bác sĩ" },
+    { w: "hospital", ipa: "/ˈhɒspɪtl/", vi: "bệnh viện", chunk: "at the hospital", lit: "ở tại - bệnh - viện", chunkVi: "ở tại bệnh viện" },
+    { w: "medicine", ipa: "/ˈmedsn/", vi: "thuốc", chunk: "take some medicine", lit: "uống - một ít - thuốc", chunkVi: "uống một ít thuốc" },
+    { w: "rest", ipa: "/rest/", vi: "nghỉ ngơi", chunk: "take a rest", lit: "lấy - một - sự nghỉ ngơi", chunkVi: "nghỉ ngơi một chút" }
+  ]},
+  { day: 8, title: "Ngày 8: Học Tập & Công Việc", words: [
+    { w: "learn", ipa: "/lɜːn/", vi: "học", chunk: "learn every day", lit: "học - mỗi - ngày", chunkVi: "học tập mỗi ngày" },
+    { w: "book", ipa: "/bʊk/", vi: "cuốn sách", chunk: "open your book", lit: "mở - của bạn - sách", chunkVi: "mở sách của bạn ra" },
+    { w: "write", ipa: "/raɪt/", vi: "viết", chunk: "write it down", lit: "viết - nó - xuống", chunkVi: "viết nó xuống" },
+    { w: "read", ipa: "/riːd/", vi: "đọc", chunk: "read out loud", lit: "đọc - ra - to", chunkVi: "đọc to lên" },
+    { w: "speak", ipa: "/spiːk/", vi: "nói", chunk: "speak English well", lit: "nói - tiếng Anh - tốt", chunkVi: "nói tiếng Anh tốt" },
+    { w: "listen", ipa: "/ˈlɪsn/", vi: "lắng nghe", chunk: "listen to me", lit: "lắng nghe - tới - tôi", chunkVi: "hãy lắng nghe tôi" },
+    { w: "question", ipa: "/ˈkwestʃən/", vi: "câu hỏi", chunk: "ask a question", lit: "hỏi - một - câu hỏi", chunkVi: "đặt một câu hỏi" },
+    { w: "answer", ipa: "/ˈɑːnsə/", vi: "câu trả lời", chunk: "give an answer", lit: "đưa - một - câu trả lời", chunkVi: "đưa ra câu trả lời" },
+    { w: "job", ipa: "/dʒɒb/", vi: "công việc", chunk: "a good job", lit: "một - tốt - công việc", chunkVi: "một công việc tốt" },
+    { w: "busy", ipa: "/ˈbɪzi/", vi: "bận rộn", chunk: "busy all day", lit: "bận - cả - ngày", chunkVi: "bận rộn cả ngày" }
+  ]},
+  { day: 9, title: "Ngày 9: Trang Phục & Màu Sắc", words: [
+    { w: "shirt", ipa: "/ʃɜːt/", vi: "áo sơ mi", chunk: "wear white shirt", lit: "mặc - trắng - áo sơ mi", chunkVi: "mặc áo sơ mi trắng" },
+    { w: "shoes", ipa: "/ʃuːz/", vi: "đôi giày", chunk: "put on shoes", lit: "mang - vào - đôi giày", chunkVi: "mang giày vào" },
+    { w: "hat", ipa: "/hæt/", vi: "chiếc mũ", chunk: "wear a hat", lit: "đội - một - chiếc mũ", chunkVi: "đội một chiếc mũ" },
+    { w: "bag", ipa: "/bæɡ/", vi: "chiếc túi", chunk: "carry my bag", lit: "mang - của tôi - túi", chunkVi: "mang túi của tôi" },
+    { w: "black", ipa: "/blæk/", vi: "màu đen", chunk: "a black car", lit: "một - đen - chiếc xe", chunkVi: "một chiếc xe màu đen" },
+    { w: "white", ipa: "/waɪt/", vi: "màu trắng", chunk: "clean white paper", lit: "sạch - trắng - tờ giấy", chunkVi: "tờ giấy trắng sạch" },
+    { w: "red", ipa: "/red/", vi: "màu đỏ", chunk: "sweet red apple", lit: "ngọt - đỏ - quả táo", chunkVi: "quả táo đỏ ngọt" },
+    { w: "blue", ipa: "/bluː/", vi: "màu xanh dương", chunk: "clear blue sky", lit: "trong - xanh - bầu trời", chunkVi: "bầu trời trong xanh" },
+    { w: "green", ipa: "/ɡriːn/", vi: "màu xanh lá", chunk: "tall green trees", lit: "cao - xanh - những cây", chunkVi: "những hàng cây xanh cao" },
+    { w: "yellow", ipa: "/ˈjeləʊ/", vi: "màu vàng", chunk: "bright yellow sun", lit: "sáng - vàng - mặt trời", chunkVi: "mặt trời vàng rực rỡ" }
+  ]},
+  { day: 10, title: "Ngày 10: Giải Trí & Công Nghệ Cơ Bản", words: [
+    { w: "phone", ipa: "/fəʊn/", vi: "điện thoại", chunk: "answer the phone", lit: "nghe - chiếc - điện thoại", chunkVi: "nghe điện thoại" },
+    { w: "music", ipa: "/ˈmjuːzɪk/", vi: "âm nhạc", chunk: "listen to music", lit: "nghe - tới - âm nhạc", chunkVi: "nghe nhạc" },
+    { w: "movie", ipa: "/ˈmuːvi/", vi: "bộ phim", chunk: "watch a movie", lit: "xem - một - bộ phim", chunkVi: "xem một bộ phim" },
+    { w: "game", ipa: "/ɡeɪm/", vi: "trò chơi", chunk: "play a game", lit: "chơi - một - trò chơi", chunkVi: "chơi một trò chơi" },
+    { w: "song", ipa: "/sɒŋ/", vi: "bài hát", chunk: "my favorite song", lit: "của tôi - yêu thích - bài hát", chunkVi: "bài hát yêu thích của tôi" },
+    { w: "picture", ipa: "/ˈpɪktʃə/", vi: "bức ảnh / tranh", chunk: "take a picture", lit: "chụp - một - bức ảnh", chunkVi: "chụp một bức ảnh" },
+    { w: "park", ipa: "/pɑːk/", vi: "công viên", chunk: "walk in park", lit: "đi dạo - trong - công viên", chunkVi: "đi dạo trong công viên" },
+    { w: "coffee", ipa: "/ˈkɒfi/", vi: "cà phê", chunk: "make hot coffee", lit: "pha - nóng - cà phê", chunkVi: "pha cà phê nóng" },
+    { w: "tea", ipa: "/tiː/", vi: "trà", chunk: "cup of tea", lit: "tách - của - trà", chunkVi: "một tách trà" },
+    { w: "smile", ipa: "/smaɪl/", vi: "mỉm cười", chunk: "smile at me", lit: "mỉm cười - với - tôi", chunkVi: "mỉm cười với tôi" }
+  ]}
+];
+
+/* ============================================================================
+   PHẦN 3: TRỌN BỘ 100% NGỮ PHÁP A1 (15 BÀI HỌC = 75 CÂU HỎI KIỂM TRA)
+   ============================================================================ */
+const GRAMMAR_LESSONS = [
+  {
+    id: 1, title: "Bài 1: Động từ To Be (Am / Is / Are)",
+    summary: "Dùng để giới thiệu tên, tuổi, nghề nghiệp, tính chất hoặc vị trí hiện tại của người và vật.",
+    formulas: ["(+) I + am | He/She/It + is | You/We/They + are", "(-) S + am/is/are + not", "(?) Am/Is/Are + S + ...?"],
+    patterns: [
+      { chunk: "I am ready", lit: "Tôi - thì - sẵn sàng", vi: "Tôi đã sẵn sàng" },
+      { chunk: "She is busy", lit: "Cô ấy - thì - bận rộn", vi: "Cô ấy đang bận" },
+      { chunk: "Are you tired?", lit: "Thì - bạn - mệt?", vi: "Bạn có mệt không?" }
+    ],
+    quizzes: [
+      { q: "I ___ very happy today.", hint: "Chủ ngữ 'I' đi với am", opts: ["am", "is", "are", "be"], ans: 0 },
+      { q: "She ___ in the kitchen now.", hint: "Chủ ngữ số ít 'She' đi với is", opts: ["am", "are", "is", "be"], ans: 2 },
+      { q: "They ___ my good friends.", hint: "Chủ ngữ số nhiều 'They' đi với are", opts: ["is", "am", "be", "are"], ans: 3 },
+      { q: "___ you free this evening?", hint: "Câu hỏi với 'you' dùng Are", opts: ["Is", "Are", "Am", "Do"], ans: 1 },
+      { q: "The coffee ___ not hot.", hint: "The coffee là danh từ số ít (It)", opts: ["are", "am", "is", "do"], ans: 2 }
+    ]
+  },
+  {
+    id: 2, title: "Bài 2: Đại từ nhân xưng & Tính từ sở hữu",
+    summary: "Đại từ nhân xưng làm chủ ngữ đứng đầu câu (I, You, He, She, It, We, They). Tính từ sở hữu luôn đứng trước danh từ để chỉ quyền sở hữu (My, Your, His, Her, Its, Our, Their).",
+    formulas: ["I -> my | You -> your | He -> his | She -> her", "It -> its | We -> our | They -> their + Danh từ"],
+    patterns: [
+      { chunk: "love my family", lit: "yêu - của tôi - gia đình", vi: "yêu gia đình của tôi" },
+      { chunk: "wash your hands", lit: "rửa - của bạn - đôi tay", vi: "rửa tay của bạn" },
+      { chunk: "call his father", lit: "gọi - của anh ấy - bố", vi: "gọi bố của anh ấy" }
+    ],
+    quizzes: [
+      { q: "This is ___ new house. I love it.", hint: "Của tôi (tương ứng với I)", opts: ["I", "my", "me", "he"], ans: 1 },
+      { q: "He is driving ___ car to work.", hint: "Của anh ấy (tương ứng với He)", opts: ["her", "your", "his", "their"], ans: 2 },
+      { q: "She lives with ___ mother.", hint: "Của cô ấy (tương ứng với She)", opts: ["his", "her", "my", "our"], ans: 1 },
+      { q: "We love ___ country very much.", hint: "Của chúng tôi (tương ứng với We)", opts: ["our", "their", "your", "us"], ans: 0 },
+      { q: "They are cleaning ___ room now.", hint: "Của họ (tương ứng với They)", opts: ["they", "them", "our", "their"], ans: 3 }
+    ]
+  },
+  {
+    id: 3, title: "Bài 3: Mạo từ (A / An / The) & Danh từ số nhiều",
+    summary: "• 'An' đứng trước nguyên âm (u, e, o, a, i). 'A' đứng trước phụ âm (chỉ 1 vật chưa xác định).\n• 'The' dùng cho vật đã xác định hoặc duy nhất.\n• Danh từ số nhiều thường thêm -s hoặc -es (sau s, x, z, ch, sh).",
+    formulas: ["a + phụ âm (a book) | an + nguyên âm (an apple, an hour)", "Số nhiều: một (one book) -> nhiều (two books, two watches)"],
+    patterns: [
+      { chunk: "eat an apple", lit: "ăn - một - quả táo", vi: "ăn một quả táo" },
+      { chunk: "open the door", lit: "mở - cánh (đã biết) - cửa", vi: "mở cửa ra" },
+      { chunk: "read two books", lit: "đọc - hai - cuốn sách", vi: "đọc hai cuốn sách" }
+    ],
+    quizzes: [
+      { q: "I eat ___ red apple every morning.", hint: "'red' bắt đầu bằng phụ âm /r/", opts: ["an", "a", "many", "two"], ans: 1 },
+      { q: "Wait for me ___ hour, please!", hint: "'hour' (/ˈaʊə/) có chữ h câm, bắt đầu bằng nguyên âm", opts: ["a", "an", "two", "some"], ans: 1 },
+      { q: "Can you close ___ window, please?", hint: "Cửa sổ cả người nói và người nghe đều biết rõ", opts: ["a", "an", "the", "many"], ans: 2 },
+      { q: "There are three ___ on the table.", hint: "Số nhiều của box (tận cùng bằng x thêm -es)", opts: ["box", "boxs", "boxes", "a box"], ans: 2 },
+      { q: "She has two happy ___.", hint: "Bất quy tắc: 1 child -> nhiều children", opts: ["child", "childs", "children", "childrens"], ans: 2 }
+    ]
+  },
+  {
+    id: 4, title: "Bài 4: Đại từ chỉ định (This / That / These / Those)",
+    summary: "• Ở gần: This (1 vật/người) — These (nhiều vật/người).\n• Ở xa: That (1 vật/người) — Those (nhiều vật/người).",
+    formulas: ["This / That + is + danh từ số ít", "These / Those + are + danh từ số nhiều"],
+    patterns: [
+      { chunk: "read this book", lit: "đọc - cuốn này - sách", vi: "đọc cuốn sách này" },
+      { chunk: "look at that", lit: "nhìn - vào - cái kia", vi: "nhìn vào cái kia kìa" },
+      { chunk: "these fresh fruits", lit: "những này - tươi - trái cây", vi: "những trái cây tươi này" }
+    ],
+    quizzes: [
+      { q: "___ is my phone right here.", hint: "Số ít (is) và ở ngay đây (right here)", opts: ["These", "Those", "This", "They"], ans: 2 },
+      { q: "___ shoes over there are very cheap.", hint: "'shoes' là số nhiều và ở đằng kia (over there)", opts: ["This", "That", "These", "Those"], ans: 3 },
+      { q: "Are ___ books here yours?", hint: "'books' là số nhiều và ở gần (here)", opts: ["this", "that", "these", "it"], ans: 2 },
+      { q: "Who is ___ man standing far over there?", hint: "'man' là số ít và ở xa (over there)", opts: ["this", "that", "these", "those"], ans: 1 },
+      { q: "These apples ___ very sweet.", hint: "Chủ ngữ số nhiều 'These apples'", opts: ["is", "am", "are", "be"], ans: 2 }
+    ]
+  },
+  {
+    id: 5, title: "Bài 5: Cấu trúc There is / There are & Some / Any",
+    summary: "• 'There is' + danh từ số ít / không đếm được. 'There are' + danh từ số nhiều (nghĩa là: Có...).\n• 'Some' dùng trong câu khẳng định. 'Any' dùng trong câu phủ định và nghi vấn.",
+    formulas: ["(+) There is a/some... | There are some...", "(-) There isn't / aren't + any...", "(?) Is there / Are there + any...?"],
+    patterns: [
+      { chunk: "there is water", lit: "có - là - nước", vi: "có nước" },
+      { chunk: "buy some fruit", lit: "mua - một ít - trái cây", vi: "mua một ít trái cây" },
+      { chunk: "any questions now", lit: "bất kỳ - câu hỏi - bây giờ", vi: "có câu hỏi nào bây giờ không" }
+    ],
+    quizzes: [
+      { q: "There ___ a big table in the kitchen.", hint: "'a big table' là danh từ số ít", opts: ["are", "is", "am", "have"], ans: 1 },
+      { q: "There ___ four chairs in my room.", hint: "'four chairs' là danh từ số nhiều", opts: ["is", "am", "are", "has"], ans: 2 },
+      { q: "I want to buy ___ fresh meat.", hint: "Câu khẳng định dùng some", opts: ["any", "some", "a", "an"], ans: 1 },
+      { q: "There isn't ___ coffee in the cup.", hint: "Câu phủ định (isn't) dùng any", opts: ["some", "a", "an", "any"], ans: 3 },
+      { q: "Are there ___ good movies tonight?", hint: "Câu hỏi nghi vấn dùng any", opts: ["some", "any", "a", "much"], ans: 1 }
+    ]
+  },
+  {
+    id: 6, title: "Bài 6: Thì Hiện Tại Đơn (Động từ thường)",
+    summary: "Diễn tả thói quen hàng ngày, lịch trình hoặc sự thật hiển nhiên. Chú ý chia động từ thêm -s/-es với chủ ngữ số ít (He, She, It).",
+    formulas: ["(+) I/You/We/They + V | He/She/It + V(s/es)", "(-) S + don't / doesn't + V(nguyên mẫu)", "(?) Do / Does + S + V(nguyên mẫu)?"],
+    patterns: [
+      { chunk: "I drink coffee", lit: "Tôi - uống - cà phê", vi: "Tôi uống cà phê" },
+      { chunk: "She cooks dinner", lit: "Cô ấy - nấu - bữa tối", vi: "Cô ấy nấu bữa tối" },
+      { chunk: "Do you understand?", lit: "Trợ từ - bạn - hiểu?", vi: "Bạn có hiểu không?" }
+    ],
+    quizzes: [
+      { q: "I ___ up early every day.", hint: "Chủ ngữ I đi với động từ nguyên mẫu", opts: ["wakes", "wake", "waking", "woke"], ans: 1 },
+      { q: "My father ___ black coffee every morning.", hint: "Chủ ngữ số ít My father (He) thêm -s", opts: ["drink", "drinking", "drinks", "to drink"], ans: 2 },
+      { q: "They ___ not live near here.", hint: "Phủ định với chủ ngữ They", opts: ["does", "do", "are", "is"], ans: 1 },
+      { q: "___ she speak English well?", hint: "Câu hỏi với chủ ngữ số ít she", opts: ["Do", "Is", "Does", "Are"], ans: 2 },
+      { q: "He doesn't ___ to bed late.", hint: "Sau doesn't động từ về nguyên mẫu", opts: ["goes", "going", "went", "go"], ans: 3 }
+    ]
+  },
+  {
+    id: 7, title: "Bài 7: Trạng từ chỉ tần suất (Always -> Never)",
+    summary: "Cho biết mức độ thường xuyên của hành động: Always (100% luôn luôn), Usually (80% thường xuyên), Often (60% hay), Sometimes (40% thỉnh thoảng), Never (0% không bao giờ).",
+    formulas: ["Đứng TRƯỚC động từ thường: S + always/often/never + V", "Đứng SAU động từ To Be: S + am/is/are + always/never + ..."],
+    patterns: [
+      { chunk: "always wake early", lit: "luôn luôn - dậy - sớm", vi: "luôn luôn thức dậy sớm" },
+      { chunk: "never drink beer", lit: "không bao giờ - uống - bia", vi: "không bao giờ uống bia" },
+      { chunk: "is always happy", lit: "thì - luôn luôn - vui vẻ", vi: "luôn luôn vui vẻ" }
+    ],
+    quizzes: [
+      { q: "I ___ brush my teeth before sleeping.", hint: "100% luôn luôn làm mỗi tối", opts: ["never", "always", "am", "did"], ans: 1 },
+      { q: "Vị trí đúng: She ___ late for work.", hint: "Trạng từ tần suất đứng SAU động từ To Be (is)", opts: ["never is", "is never", "never be", "are never"], ans: 1 },
+      { q: "Vị trí đúng: We ___ lunch together.", hint: "Trạng từ tần suất đứng TRƯỚC động từ thường (have)", opts: ["have often", "often have", "are often", "often having"], ans: 1 },
+      { q: "He doesn't like fish, so he ___ eats it.", hint: "Không thích nên không bao giờ (0%) ăn", opts: ["always", "usually", "often", "never"], ans: 3 },
+      { q: "Do you ___ walk in the park?", hint: "Trạng từ tần suất trong câu hỏi", opts: ["often", "never not", "every", "time"], ans: 0 }
+    ]
+  },
+  {
+    id: 8, title: "Bài 8: Thì Hiện Tại Tiếp Diễn (Am/Is/Are + V-ing)",
+    summary: "Diễn tả việc đang xảy ra ngay lúc đang nói (now, right now, at the moment, Look!, Listen!).",
+    formulas: ["(+) S + am / is / are + V-ing", "(-) S + am / is / are + not + V-ing", "(?) Am / Is / Are + S + V-ing?"],
+    patterns: [
+      { chunk: "I am working", lit: "Tôi - đang - làm việc", vi: "Tôi đang làm việc" },
+      { chunk: "is raining outside", lit: "đang - mưa - bên ngoài", vi: "bên ngoài trời đang mưa" },
+      { chunk: "are you listening", lit: "đang - bạn - lắng nghe", vi: "bạn có đang nghe không" }
+    ],
+    quizzes: [
+      { q: "Look! It ___ heavily outside.", hint: "Có dấu hiệu Look! dùng hiện tại tiếp diễn", opts: ["rain", "rains", "is raining", "rained"], ans: 2 },
+      { q: "I ___ waiting for my friend right now.", hint: "Chủ ngữ I đi với am + V-ing", opts: ["is", "are", "am", "do"], ans: 2 },
+      { q: "What ___ they cooking in the kitchen?", hint: "Câu hỏi tiếp diễn với chủ ngữ they", opts: ["do", "is", "are", "does"], ans: 2 },
+      { q: "She is ___ a letter at the moment.", hint: "write bỏ e thêm -ing -> writing", opts: ["write", "writeing", "writing", "writes"], ans: 2 },
+      { q: "We aren't ___ TV right now.", hint: "Sau aren't là V-ing", opts: ["watch", "watches", "watched", "watching"], ans: 3 }
+    ]
+  },
+  {
+    id: 9, title: "Bài 9: Động từ khuyết thiếu Can / Can't",
+    summary: "Dùng để diễn tả khả năng (biết làm gì / có thể làm gì) hoặc lời xin phép, nhờ vả lịch sự. Động từ theo sau Can/Can't luôn nguyên mẫu cho mọi chủ ngữ.",
+    formulas: ["(+) S + can + V(nguyên mẫu)", "(-) S + cannot (can't) + V(nguyên mẫu)", "(?) Can + S + V(nguyên mẫu)?"],
+    patterns: [
+      { chunk: "can speak English", lit: "có thể - nói - tiếng Anh", vi: "có thể nói tiếng Anh" },
+      { chunk: "can not swim", lit: "không thể - bơi", vi: "không biết bơi" },
+      { chunk: "Can you help?", lit: "Có thể - bạn - giúp?", vi: "Bạn giúp được không?" }
+    ],
+    quizzes: [
+      { q: "He can ___ a car very well.", hint: "Sau 'can' động từ luôn nguyên mẫu", opts: ["drives", "driving", "drove", "drive"], ans: 3 },
+      { q: "Sorry, I ___ hear you clearly.", hint: "Không thể nghe rõ", opts: ["don't can", "can't", "not can", "am not"], ans: 1 },
+      { q: "___ you open the door for me, please?", hint: "Câu nhờ vả lịch sự với Can", opts: ["Are", "Do", "Can", "Have"], ans: 2 },
+      { q: "She ___ cook very delicious food.", hint: "Khả năng nấu ăn ngon", opts: ["cans", "can", "is can", "to can"], ans: 1 },
+      { q: "Can they come today? - No, they ___.", hint: "Trả lời ngắn phủ định cho câu hỏi Can", opts: ["don't", "aren't", "can't", "won't"], ans: 2 }
+    ]
+  },
+  {
+    id: 10, title: "Bài 10: Giới từ Thời gian & Địa điểm (In / On / At)",
+    summary: "• Thời gian: AT + giờ (at 6 AM, at night); ON + ngày/thứ (on Monday, on May 1st); IN + buổi/tháng/mùa/năm (in the morning, in 2026).\n• Địa điểm: IN (bên trong), ON (trên bề mặt), AT (tại 1 điểm: at home, at work).",
+    formulas: ["AT + giờ/địa điểm cụ thể | ON + ngày/bề mặt | IN + buổi/tháng/không gian kín"],
+    patterns: [
+      { chunk: "in the morning", lit: "vào - buổi - sáng", vi: "vào buổi sáng" },
+      { chunk: "on the table", lit: "ở trên - cái - bàn", vi: "ở trên mặt bàn" },
+      { chunk: "wake at six", lit: "dậy - lúc - sáu giờ", vi: "thức dậy lúc 6 giờ" }
+    ],
+    quizzes: [
+      { q: "I always start work ___ 8 o'clock.", hint: "Giờ cụ thể đi với giới từ at", opts: ["in", "on", "at", "to"], ans: 2 },
+      { q: "We don't work ___ Sunday.", hint: "Các thứ trong tuần đi với giới từ on", opts: ["in", "on", "at", "of"], ans: 1 },
+      { q: "My mother is cooking ___ the kitchen.", hint: "Bên trong không gian phòng bếp dùng in", opts: ["on", "at", "in", "to"], ans: 2 },
+      { q: "Your keys are ___ the table.", hint: "Trên bề mặt cái bàn dùng on", opts: ["in", "on", "at", "under"], ans: 1 },
+      { q: "I like reading books ___ the evening.", hint: "Các buổi trong ngày (morning/afternoon/evening) dùng in", opts: ["at", "on", "in", "by"], ans: 2 }
+    ]
+  },
+  {
+    id: 11, title: "Bài 11: Từ để hỏi Wh-Questions",
+    summary: "• What: Cái gì | Where: Ở đâu | When / What time: Khi nào / Mấy giờ\n• Who: Ai | Why: Tại sao | How: Như thế nào / Bằng cách nào.",
+    formulas: ["Wh-word + am/is/are + S...?", "Wh-word + do/does/did/can + S + V(nguyên mẫu)?"],
+    patterns: [
+      { chunk: "Where do you", lit: "Ở đâu - trợ từ - bạn", vi: "Bạn ... ở đâu?" },
+      { chunk: "What is this?", lit: "Cái gì - là - cái này?", vi: "Cái này là cái gì?" },
+      { chunk: "How are you?", lit: "Thế nào - thì - bạn?", vi: "Bạn có khỏe không?" }
+    ],
+    quizzes: [
+      { q: "___ is your full name?", hint: "Hỏi tên (thông tin cái gì)", opts: ["Where", "What", "When", "Why"], ans: 1 },
+      { q: "___ does your father live? - In Dak Lak.", hint: "Câu trả lời là địa điểm nên hỏi Ở đâu", opts: ["What", "Who", "Where", "When"], ans: 2 },
+      { q: "___ do you wake up every day? - At 6 AM.", hint: "Hỏi thời gian/mấy giờ", opts: ["Where", "Who", "What time", "Why"], ans: 2 },
+      { q: "___ is that woman? - She is my mother.", hint: "Hỏi về người (Ai)", opts: ["What", "Who", "Where", "How"], ans: 1 },
+      { q: "___ are you sad? - Because I lost my phone.", hint: "Trả lời Because (Bởi vì) nên hỏi Tại sao", opts: ["When", "Where", "How", "Why"], ans: 3 }
+    ]
+  },
+  {
+    id: 12, title: "Bài 12: Đếm được & Không đếm được (How much / How many)",
+    summary: "• Danh từ đếm được số nhiều (books, apples, people) đi với 'How many' và 'many'.\n• Danh từ không đếm được (water, money, rice, coffee, time) luôn tính là số ít, đi với 'How much' và 'much'.",
+    formulas: ["How many + Danh từ số nhiều + are there / do you have?", "How much + Danh từ không đếm được / Hỏi giá tiền"],
+    patterns: [
+      { chunk: "how much money", lit: "bao nhiêu - tiền", vi: "bao nhiêu tiền" },
+      { chunk: "how many people", lit: "bao nhiêu - người", vi: "bao nhiêu người" },
+      { chunk: "drink much water", lit: "uống - nhiều - nước", vi: "uống nhiều nước" }
+    ],
+    quizzes: [
+      { q: "How ___ money do you have?", hint: "'money' là danh từ không đếm được", opts: ["many", "much", "any", "some"], ans: 1 },
+      { q: "How ___ chairs are there in the room?", hint: "'chairs' là danh từ đếm được số nhiều", opts: ["much", "many", "long", "old"], ans: 1 },
+      { q: "How ___ is this shirt? - It's 10 dollars.", hint: "Mẫu câu hỏi giá tiền quen thuộc", opts: ["many", "much", "price", "money"], ans: 1 },
+      { q: "We don't have ___ time left.", hint: "'time' (thời gian) không đếm được", opts: ["many", "a", "much", "few"], ans: 2 },
+      { q: "She drinks a ___ of water every day.", hint: "Cụm từ 'a lot of' (nhiều) dùng cho cả hai loại", opts: ["many", "much", "lot", "little"], ans: 2 }
+    ]
+  },
+  {
+    id: 13, title: "Bài 13: Quá Khứ Đơn với Was/Were & Động từ có quy tắc (-ed)",
+    summary: "Diễn tả việc đã qua và kết thúc trong quá khứ (yesterday, last night, two days ago).\n• To Be quá khứ: I/He/She/It + was | You/We/They + were.\n• Động từ có quy tắc: thêm -ed (worked, cleaned, watched).",
+    formulas: ["(+) S + was/were | S + V-ed", "(-) S + wasn't / weren't | S + didn't + V(nguyên mẫu)", "(?) Was/Were + S...? | Did + S + V(nguyên mẫu)?"],
+    patterns: [
+      { chunk: "I was busy", lit: "Tôi - đã - bận", vi: "Tôi đã rất bận" },
+      { chunk: "cleaned the house", lit: "đã dọn - ngôi - nhà", vi: "đã dọn dẹp ngôi nhà" },
+      { chunk: "cooked dinner yesterday", lit: "đã nấu - bữa tối - hôm qua", vi: "hôm qua đã nấu bữa tối" }
+    ],
+    quizzes: [
+      { q: "I ___ very tired last night.", hint: "Quá khứ của am (chủ ngữ I) là was", opts: ["am", "was", "were", "be"], ans: 1 },
+      { q: "They ___ at home yesterday morning.", hint: "Chủ ngữ số nhiều They đi với were", opts: ["was", "are", "were", "did"], ans: 2 },
+      { q: "She ___ her room yesterday.", hint: "Động từ có quy tắc thêm -ed", opts: ["clean", "cleans", "cleaned", "cleaning"], ans: 2 },
+      { q: "We didn't ___ TV last night.", hint: "Sau didn't động từ về nguyên mẫu", opts: ["watched", "watches", "watching", "watch"], ans: 3 },
+      { q: "___ you work hard yesterday?", hint: "Trợ động từ câu hỏi quá khứ với động từ thường", opts: ["Were", "Was", "Do", "Did"], ans: 3 }
+    ]
+  },
+  {
+    id: 14, title: "Bài 14: Quá Khứ Đơn với Động từ Bất quy tắc",
+    summary: "Một số động từ thông dụng không thêm -ed mà biến đổi sang cột 2 (V2) trong câu khẳng định quá khứ đơn:\ngo -> went | eat -> ate | drink -> drank | buy -> bought | see -> saw | have -> had | wake -> woke | sleep -> slept.",
+    formulas: ["(+) S + V2 (went, ate, bought, saw, had...)", "(-) S + didn't + V(nguyên mẫu: go, eat, buy...)"],
+    patterns: [
+      { chunk: "went back home", lit: "đã đi - về - nhà", vi: "đã đi về nhà" },
+      { chunk: "bought fresh fruit", lit: "đã mua - tươi - trái cây", vi: "đã mua trái cây tươi" },
+      { chunk: "slept very well", lit: "đã ngủ - rất - ngon", vi: "đã ngủ rất ngon" }
+    ],
+    quizzes: [
+      { q: "I ___ to bed early last night.", hint: "Quá khứ của go là went", opts: ["go", "goed", "went", "gone"], ans: 2 },
+      { q: "She ___ a new bag two days ago.", hint: "Quá khứ của buy là bought", opts: ["buy", "buyed", "bought", "buying"], ans: 2 },
+      { q: "We ___ hot breakfast together this morning.", hint: "Quá khứ của eat là ate", opts: ["eat", "ate", "eaten", "eating"], ans: 1 },
+      { q: "He didn't ___ coffee yesterday.", hint: "Chú ý: có didn't nên động từ trở về nguyên mẫu!", opts: ["drank", "drunk", "drinks", "drink"], ans: 3 },
+      { q: "I ___ my best friend at the park yesterday.", hint: "Quá khứ của see là saw", opts: ["see", "saw", "seen", "seed"], ans: 1 }
+    ]
+  },
+  {
+    id: 15, title: "Bài 15: Tương Lai (Be going to / Will) & So sánh hơn",
+    summary: "• Tương lai: 'am/is/are going to + V' (dự định có kế hoạch); 'will + V' (quyết định tức thì, lời hứa).\n• So sánh hơn: Tính từ ngắn + '-er + than' (faster than, cheaper than); Tính từ dài dùng 'more + adj + than' (more expensive than).",
+    formulas: ["S + am/is/are going to + V | S + will + V", "Adj ngắn-er + than (cheaper than) | more + Adj dài + than"],
+    patterns: [
+      { chunk: "will call tomorrow", lit: "sẽ - gọi - ngày mai", vi: "sẽ gọi vào ngày mai" },
+      { chunk: "much cheaper than", lit: "nhiều - rẻ hơn - so với", vi: "rẻ hơn nhiều so với" },
+      { chunk: "more expensive now", lit: "hơn - đắt đỏ - bây giờ", vi: "bây giờ đắt đỏ hơn" }
+    ],
+    quizzes: [
+      { q: "I promise I ___ help you tomorrow.", hint: "Lời hứa dùng will + V", opts: ["am", "will", "going", "did"], ans: 1 },
+      { q: "She is ___ to visit her mother next week.", hint: "Cấu trúc dự định: is going to + V", opts: ["go", "will", "going", "went"], ans: 2 },
+      { q: "This bag is ___ than that bag.", hint: "'cheap' là tính từ ngắn -> thêm -er", opts: ["cheap", "cheaper", "more cheap", "cheapest"], ans: 1 },
+      { q: "A car is ___ expensive than a bike.", hint: "'expensive' là tính từ dài -> dùng more ... than", opts: ["many", "much", "more", "er"], ans: 2 },
+      { q: "Today is ___ than yesterday.", hint: "'hot' gấp đôi phụ âm cuối thêm -er -> hotter", opts: ["hoter", "hotter", "more hot", "hottest"], ans: 1 }
+    ]
+  }
+];
+
+/* ============================================================================
+   PHẦN 4: LƯU TRỮ OFFLINE, ĐỒNG HỒ THỜI GIAN THỰC & SPACED REPETITION (SRS)
+   ============================================================================ */
+const STORAGE_KEY = "A1_MASTER_PRO_FULL_V2";
+const CUSTOM_VOCAB_KEY = "A1_MASTER_CUSTOM_VOCAB_V2";
+const SRS_HOURS = [4, 24, 72, 168];
+
+let VOCAB_DAYS = [...DEFAULT_VOCAB_DAYS];
+
+let appState = {
+  practicedIpa: [],
+  currentVocabDay: 1,
+  unlockedVocabDay: 1,
+  learnedWordsByDay: {},
+  vocabSrs: {},
+  currentGrammarId: 1,
+  unlockedGrammarId: 1,
+  grammarSrs: {}
+};
+
+function loadState() {
+  try {
+    const customVocabRaw = localStorage.getItem(CUSTOM_VOCAB_KEY);
+    if (customVocabRaw) {
+      const parsedDays = JSON.parse(customVocabRaw);
+      if (Array.isArray(parsedDays) && parsedDays.length >= DEFAULT_VOCAB_DAYS.length) {
+        VOCAB_DAYS = parsedDays;
+      }
+    }
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      appState = { ...appState, ...JSON.parse(raw) };
+    }
+  } catch (e) { console.error(e); }
+  updateWordCountUI();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+    checkSpacedRepetitionDue();
+  } catch (e) { console.error(e); }
+}
+
+function updateWordCountUI() {
+  const totalWords = VOCAB_DAYS.reduce((acc, d) => acc + d.words.length, 0);
+  document.getElementById("totalWordsBadge").textContent = totalWords;
+  document.getElementById("modalWordCount").textContent = totalWords;
+  document.getElementById("modalDayCount").textContent = VOCAB_DAYS.length;
+}
+
+let dueReviewTarget = null;
+
+function updateClockAndSRS() {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2, "0");
+  const mm = String(now.getMinutes()).padStart(2, "0");
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const mo = String(now.getMonth() + 1).padStart(2, "0");
+  document.getElementById("liveClock").textContent = `${hh}:${mm}:${ss}`;
+  document.getElementById("liveDate").textContent = `${dd}/${mo}/${now.getFullYear()}`;
+  if (now.getSeconds() % 5 === 0) checkSpacedRepetitionDue();
+}
+
+function scheduleNextSrs(srsMap, id) {
+  const nowTs = Date.now();
+  const prev = srsMap[id] || { level: -1 };
+  const nextLevel = Math.min(prev.level + 1, SRS_HOURS.length - 1);
+  srsMap[id] = {
+    level: nextLevel,
+    nextReviewTs: nowTs + SRS_HOURS[nextLevel] * 3600 * 1000
+  };
+}
+
+function formatRemainingTime(ms) {
+  if (ms <= 0) return "⚡ Đã đến hạn ôn lại!";
+  const mins = Math.ceil(ms / 60000);
+  if (mins < 60) return `Ôn sau ${mins}p`;
+  return `Ôn sau ${Math.floor(mins / 60)}h ${mins % 60}p`;
+}
+
+function checkSpacedRepetitionDue() {
+  const nowTs = Date.now();
+  let vDue = null, gDue = null;
+  for (const [k, v] of Object.entries(appState.vocabSrs)) {
+    if (v && v.nextReviewTs <= nowTs) { vDue = Number(k); break; }
+  }
+  for (const [k, v] of Object.entries(appState.grammarSrs)) {
+    if (v && v.nextReviewTs <= nowTs) { gDue = Number(k); break; }
+  }
+  document.getElementById("dotVocab").classList.toggle("show", vDue !== null);
+  document.getElementById("dotGrammar").classList.toggle("show", gDue !== null);
+
+  const banner = document.getElementById("srsBanner");
+  const msg = document.getElementById("srsMessage");
+  if (vDue !== null) {
+    dueReviewTarget = { type: "vocab", id: vDue };
+    msg.textContent = `Từ vựng Ngày ${vDue} đã đến giờ ôn tập ngắt quãng!`;
+    banner.classList.add("active");
+  } else if (gDue !== null) {
+    dueReviewTarget = { type: "grammar", id: gDue };
+    msg.textContent = `Ngữ pháp Bài ${gDue} đã đến giờ ôn tập ngắt quãng!`;
+    banner.classList.add("active");
+  } else {
+    dueReviewTarget = null;
+    banner.classList.remove("active");
+  }
+}
+
+function jumpToDueReview() {
+  if (!dueReviewTarget) return;
+  const btns = document.querySelectorAll(".nav-btn");
+  if (dueReviewTarget.type === "vocab") {
+    switchMainTab("vocab", btns[1]);
+    selectVocabDay(dueReviewTarget.id);
+    startVocabQuiz();
+  } else {
+    switchMainTab("grammar", btns[2]);
+    selectGrammarLesson(dueReviewTarget.id);
+    startGrammarQuiz();
+  }
+}
+
+/* ============================================================================
+   PHẦN 5: ÂM THANH & ĐIỀU HƯỚNG 4 TAB
+   ============================================================================ */
+function speakEnglish(text, onEndCallback = null) {
+  if (!("speechSynthesis" in window)) {
+    if (onEndCallback) setTimeout(onEndCallback, 1200);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "en-US";
+  u.rate = 0.92;
+  let called = false;
+  const done = () => { if (!called) { called = true; if (onEndCallback) onEndCallback(); } };
+  u.onend = done;
+  u.onerror = done;
+  window.speechSynthesis.speak(u);
+  setTimeout(done, Math.max(1400, text.split(" ").length * 460 + 550));
+}
+
+function switchMainTab(tabName, btnEl) {
+  if (tabName !== "speaking" && speakingRunning) stopSpeakingLoop();
+  document.querySelectorAll(".tab-pane").forEach(el => el.classList.remove("active"));
+  document.getElementById(`tab-${tabName}`).classList.add("active");
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  if (btnEl) btnEl.classList.add("active");
+
+  if (tabName === "vocab") renderVocabTab();
+  if (tabName === "grammar") renderGrammarTab();
+  if (tabName === "speaking") updateSpeakingPoolCount();
+}
+
+/* ============================================================================
+   PHẦN 6: XỬ LÝ TAB 1 (IPA & PHONICS)
+   ============================================================================ */
+let currentIpaGroup = "all", selectedIpaIndex = 0, selectedPhonicsIndex = 0;
+
+function switchIpaMode(mode) {
+  document.getElementById("btnSubIpa").classList.toggle("active", mode === "ipa");
+  document.getElementById("btnSubPhonics").classList.toggle("active", mode === "phonics");
+  document.getElementById("ipaSectionView").style.display = mode === "ipa" ? "grid" : "none";
+  document.getElementById("phonicsSectionView").style.display = mode === "phonics" ? "flex" : "none";
+  if (mode === "phonics") renderPhonicsView();
+}
+
+function filterIpaGroup(group, btnEl) {
+  currentIpaGroup = group;
+  btnEl.parentElement.querySelectorAll(".pill-btn").forEach(b => b.classList.remove("active"));
+  btnEl.classList.add("active");
+  renderIpaGrid();
+}
+
+function renderIpaGrid() {
+  const grid = document.getElementById("ipaGrid");
+  grid.innerHTML = "";
+  IPA_DATA.forEach((item, idx) => {
+    if (currentIpaGroup !== "all" && item.g !== currentIpaGroup) return;
+    const isP = appState.practicedIpa.includes(item.s);
+    const cell = document.createElement("div");
+    cell.className = `ipa-cell ${idx === selectedIpaIndex ? "active" : ""}`;
+    cell.innerHTML = `${item.s}<small>${isP ? "✓ Đã tập" : item.ex.split(",")[0]}</small>`;
+    cell.onclick = () => {
+      selectedIpaIndex = idx;
+      if (!appState.practicedIpa.includes(item.s)) {
+        appState.practicedIpa.push(item.s);
+        saveState();
+      }
+      renderIpaGrid();
+      speakEnglish(`${item.ex.split(",")[0]}. ${item.chunk}`);
+    };
+    grid.appendChild(cell);
+  });
+  document.getElementById("ipaProgressText").textContent = `Đã luyện: ${appState.practicedIpa.length}/44 âm`;
+  const item = IPA_DATA[selectedIpaIndex];
+  document.getElementById("ipaDetailCard").innerHTML = `
+    <div>
+      <div class="flex-between">
+        <span class="status-tag tag-yellow">${item.name}</span>
+        <span class="text-muted" style="font-size:0.8rem;">Âm ${selectedIpaIndex + 1}/44</span>
+      </div>
+      <div style="font-size:2.4rem; font-weight:900; color:var(--yellow); margin:4px 0;">${item.s}</div>
+      <p style="font-size:0.9rem; line-height:1.45; margin-bottom:10px;"><b class="text-yellow">Khẩu hình:</b> ${item.mouth}</p>
+      <p style="font-size:0.9rem; margin-bottom:10px;"><b class="text-yellow">Từ mẫu:</b> ${item.ex}</p>
+      <div class="chunk-box">
+        <div class="chunk-en">🔊 ${item.chunk}</div>
+        <div class="chunk-lit">Dịch từng từ: ${item.lit}</div>
+        <div class="chunk-vi">Nghĩa: ${item.vi}</div>
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:12px; width:100%;" onclick="speakEnglish('${item.ex}. ${item.chunk}')">🔊 Nghe Phát Âm Chuẩn</button>
+  `;
+}
+
+function renderPhonicsView() {
+  const nav = document.getElementById("phonicsRuleNav");
+  nav.innerHTML = "";
+  PHONICS_RULES.forEach((r, idx) => {
+    const b = document.createElement("button");
+    b.className = `pill-btn ${idx === selectedPhonicsIndex ? "active" : ""}`;
+    b.textContent = `Quy tắc ${r.id}`;
+    b.onclick = () => { selectedPhonicsIndex = idx; renderPhonicsView(); };
+    nav.appendChild(b);
+  });
+  const r = PHONICS_RULES[selectedPhonicsIndex];
+  document.getElementById("phonicsDetailCard").innerHTML = `
+    <div>
+      <span class="status-tag tag-yellow">7 Quy Tắc Đánh Vần</span>
+      <h3 style="font-size:1.2rem; color:var(--yellow); margin:8px 0;">${r.title}</h3>
+      <p style="font-size:0.92rem; line-height:1.5; white-space:pre-line; margin-bottom:10px;">${r.rule}</p>
+      <p style="font-size:0.9rem; margin-bottom:10px;"><b class="text-yellow">Ví dụ:</b> ${r.examples}</p>
+      <div class="chunk-box">
+        <div class="chunk-en">🔊 ${r.chunk}</div>
+        <div class="chunk-lit">Dịch từng từ: ${r.lit}</div>
+        <div class="chunk-vi">Nghĩa: ${r.vi}</div>
+      </div>
+    </div>
+    <button class="btn-primary" style="margin-top:12px;" onclick="speakEnglish('${r.chunk}')">🔊 Nghe Cụm Từ Mẫu</button>
+  `;
+}
+
+/* ============================================================================
+   PHẦN 7: XỬ LÝ TAB 2 (FLASHCARD TỪ VỰNG & PHẢN XẠ 3 GIÂY)
+   ============================================================================ */
+let currentCardIdx = 0, vQuizList = [], vQuizIdx = 0, vQuizInterval = null, vQuizTime = 3.0;
+
+function renderVocabTab() {
+  clearInterval(vQuizInterval);
+  document.getElementById("vocabStudyStage").style.display = "flex";
+  document.getElementById("vocabQuizStage").style.display = "none";
+
+  const nav = document.getElementById("vocabDayNav");
+  nav.innerHTML = "";
+  VOCAB_DAYS.forEach(d => {
+    const unlocked = d.day <= appState.unlockedVocabDay;
+    const srs = appState.vocabSrs[d.day];
+    const isDue = srs && srs.nextReviewTs <= Date.now();
+    const b = document.createElement("button");
+    b.className = `pill-btn ${d.day === appState.currentVocabDay ? "active" : ""} ${!unlocked ? "locked" : ""} ${isDue ? "due" : ""}`;
+    b.innerHTML = `${unlocked ? "📅" : "🔒"} Ngày ${d.day}`;
+    b.onclick = () => {
+      if (!unlocked) return alert(`Hãy vượt qua Bài thi 3 giây (10/10) của Ngày ${d.day - 1} trước!`);
+      selectVocabDay(d.day);
+    };
+    nav.appendChild(b);
+  });
+
+  const srs = appState.vocabSrs[appState.currentVocabDay];
+  document.getElementById("vocabSrsStatus").textContent = srs ? formatRemainingTime(srs.nextReviewTs - Date.now()) : "Chưa thi đỗ 3s";
+  renderVocabCard();
+}
+
+function selectVocabDay(day) {
+  appState.currentVocabDay = day;
+  currentCardIdx = 0;
+  saveState();
+  renderVocabTab();
+}
+
+function renderVocabCard() {
+  const dayObj = VOCAB_DAYS.find(d => d.day === appState.currentVocabDay) || VOCAB_DAYS[0];
+  const item = dayObj.words[currentCardIdx];
+  const learnedArr = appState.learnedWordsByDay[dayObj.day] || [];
+  const isRem = learnedArr.includes(currentCardIdx);
+
+  document.getElementById("vocabCardDisplay").innerHTML = `
+    <div class="flex-between" style="width:100%; position:absolute; top:12px; left:0; padding:0 14px;">
+      <span class="text-muted" style="font-size:0.8rem;">${dayObj.title} (${currentCardIdx + 1}/${dayObj.words.length})</span>
+      <span class="status-tag ${isRem ? "tag-green" : "tag-yellow"}">Đã thuộc: ${learnedArr.length}/${dayObj.words.length}</span>
+    </div>
+    <div style="margin-top:20px;">
+      <div class="vocab-word">${item.w}</div>
+      <div class="vocab-ipa">${item.ipa}</div>
+      <div class="vocab-meaning">${item.vi}</div>
+    </div>
+    <div class="chunk-box">
+      <div class="chunk-en">🔊 ${item.chunk}</div>
+      <div class="chunk-lit">Dịch từng từ: ${item.lit}</div>
+      <div class="chunk-vi">Nghĩa cụm: ${item.chunkVi}</div>
+    </div>
+    <div style="display:flex; gap:8px; margin-top:14px;">
+      <button class="btn-outline" onclick="speakEnglish('${item.w}. ${item.chunk}')">🔊 Phát Âm</button>
+      <button class="btn-primary" onclick="markWordRemembered(${currentCardIdx})">${isRem ? "✓ Đã Nhớ" : "Đánh Dấu Đã Nhớ"}</button>
+    </div>
+  `;
+
+  const btnQ = document.getElementById("btnStartVocabQuiz");
+  const totalInDay = dayObj.words.length;
+  btnQ.disabled = learnedArr.length < totalInDay;
+  btnQ.textContent = learnedArr.length < totalInDay
+    ? `🔒 Nhớ đủ ${learnedArr.length}/${totalInDay} thẻ để thi`
+    : `⚡ Thi Phản Xạ 3 Giây (${totalInDay} câu)`;
+}
+
+function markWordRemembered(idx) {
+  const d = appState.currentVocabDay;
+  if (!appState.learnedWordsByDay[d]) appState.learnedWordsByDay[d] = [];
+  if (!appState.learnedWordsByDay[d].includes(idx)) appState.learnedWordsByDay[d].push(idx);
+  saveState();
+  renderVocabCard();
+  const dayObj = VOCAB_DAYS.find(x => x.day === d);
+  if (currentCardIdx < dayObj.words.length - 1) setTimeout(nextVocabCard, 200);
+}
+
+function prevVocabCard() {
+  const len = VOCAB_DAYS.find(d => d.day === appState.currentVocabDay).words.length;
+  currentCardIdx = (currentCardIdx - 1 + len) % len;
+  renderVocabCard();
+}
+
+function nextVocabCard() {
+  const dayObj = VOCAB_DAYS.find(d => d.day === appState.currentVocabDay);
+  currentCardIdx = (currentCardIdx + 1) % dayObj.words.length;
+  renderVocabCard();
+  speakEnglish(dayObj.words[currentCardIdx].w);
+}
+
+function startVocabQuiz() {
+  const dayObj = VOCAB_DAYS.find(d => d.day === appState.currentVocabDay);
+  vQuizList = [...dayObj.words].sort(() => Math.random() - 0.5);
+  vQuizIdx = 0;
+  document.getElementById("vocabStudyStage").style.display = "none";
+  document.getElementById("vocabQuizStage").style.display = "flex";
+  nextVocabQuizQ();
+}
+
+function nextVocabQuizQ() {
+  clearInterval(vQuizInterval);
+  if (vQuizIdx >= vQuizList.length) {
+    const d = appState.currentVocabDay;
+    if (d === appState.unlockedVocabDay && appState.unlockedVocabDay < VOCAB_DAYS.length) appState.unlockedVocabDay++;
+    scheduleNextSrs(appState.vocabSrs, d);
+    saveState();
+    alert(`🎉 XUẤT SẮC! Bạn đã vượt qua 100% câu phản xạ 3 giây Ngày ${d} và mở khóa bài mới!`);
+    return renderVocabTab();
+  }
+  const item = vQuizList[vQuizIdx];
+  document.getElementById("vQuizProgress").textContent = `Câu ${vQuizIdx + 1}/${vQuizList.length}`;
+  document.getElementById("vQuizPrompt").textContent = item.w;
+  document.getElementById("vQuizIpa").textContent = `${item.ipa} — "${item.chunk}"`;
+
+  const pool = VOCAB_DAYS.flatMap(d => d.words.map(w => w.vi)).filter(m => m !== item.vi);
+  const opts = [item.vi, ...pool.sort(() => Math.random() - 0.5).slice(0, 3)].sort(() => Math.random() - 0.5);
+
+  const box = document.getElementById("vQuizOptions");
+  box.innerHTML = "";
+  opts.forEach(o => {
+    const b = document.createElement("button");
+    b.className = "quiz-opt";
+    b.textContent = o;
+    b.onclick = () => {
+      clearInterval(vQuizInterval);
+      if (o !== item.vi) {
+        alert(`❌ Sai phản xạ! "${item.w}" nghĩa là "${item.vi}". Hãy thử lại để đạt 100%!`);
+        return renderVocabTab();
+      }
+      vQuizIdx++;
+      nextVocabQuizQ();
+    };
+    box.appendChild(b);
+  });
+
+  speakEnglish(item.w);
+  vQuizTime = 3.0;
+  vQuizInterval = setInterval(() => {
+    vQuizTime = Math.max(0, vQuizTime - 0.1);
+    document.getElementById("vQuizTimerText").textContent = `${vQuizTime.toFixed(1)}s`;
+    document.getElementById("vQuizTimerBar").style.width = `${(vQuizTime / 3.0) * 100}%`;
+    if (vQuizTime <= 0) {
+      clearInterval(vQuizInterval);
+      alert(`⏰ Hết 3 giây! "${item.w}" nghĩa là "${item.vi}". Hãy thi lại nhé!`);
+      renderVocabTab();
+    }
+  }, 100);
+}
+
+/* ============================================================================
+   PHẦN 8: XỬ LÝ TAB 3 (15 BÀI NGỮ PHÁP A1 & BÀI TẬP 15 GIÂY)
+   ============================================================================ */
+let gQuizIdx = 0, gQuizInterval = null, gQuizTime = 15.0;
+
+function renderGrammarTab() {
+  clearInterval(gQuizInterval);
+  document.getElementById("grammarStudyStage").style.display = "flex";
+  document.getElementById("grammarQuizStage").style.display = "none";
+
+  const nav = document.getElementById("grammarLessonNav");
+  nav.innerHTML = "";
+  GRAMMAR_LESSONS.forEach(l => {
+    const unlocked = l.id <= appState.unlockedGrammarId;
+    const srs = appState.grammarSrs[l.id];
+    const isDue = srs && srs.nextReviewTs <= Date.now();
+    const b = document.createElement("button");
+    b.className = `pill-btn ${l.id === appState.currentGrammarId ? "active" : ""} ${!unlocked ? "locked" : ""} ${isDue ? "due" : ""}`;
+    b.innerHTML = `${unlocked ? "📐" : "🔒"} Bài ${l.id}`;
+    b.onclick = () => {
+      if (!unlocked) return alert(`Hãy hoàn thành đúng 5/5 câu ở Bài ${l.id - 1} trước!`);
+      selectGrammarLesson(l.id);
+    };
+    nav.appendChild(b);
+  });
+
+  const srs = appState.grammarSrs[appState.currentGrammarId];
+  document.getElementById("grammarSrsStatus").textContent = srs ? formatRemainingTime(srs.nextReviewTs - Date.now()) : "Chưa vượt qua 5 câu";
+
+  const lesson = GRAMMAR_LESSONS.find(x => x.id === appState.currentGrammarId);
+  const formulasHtml = lesson.formulas.map(f => `<div class="formula-badge">${f}</div>`).join("<br>");
+  const patternsHtml = lesson.patterns.map(p => `
+    <div class="chunk-box" style="margin-top:6px; cursor:pointer;" onclick="speakEnglish('${p.chunk.replace(/'/g, "\\'")}')">
+      <div class="chunk-en">🔊 ${p.chunk}</div>
+      <div class="chunk-lit">Dịch từng từ: ${p.lit}</div>
+      <div class="chunk-vi">Nghĩa: ${p.vi}</div>
+    </div>
+  `).join("");
+
+  document.getElementById("grammarTheoryBox").innerHTML = `
+    <h3 style="color:var(--yellow); font-size:1.2rem; margin-bottom:6px;">${lesson.title}</h3>
+    <p style="font-size:0.9rem; line-height:1.45; margin-bottom:8px; white-space:pre-line;">${lesson.summary}</p>
+    <div style="margin-bottom:8px;">${formulasHtml}</div>
+    <div style="font-weight:800; color:var(--yellow); font-size:0.85rem;">Mẫu câu 3-4 từ thông dụng (Bấm để nghe):</div>
+    ${patternsHtml}
+  `;
+}
+
+function selectGrammarLesson(id) {
+  appState.currentGrammarId = id;
+  saveState();
+  renderGrammarTab();
+}
+
+function startGrammarQuiz() {
+  gQuizIdx = 0;
+  document.getElementById("grammarStudyStage").style.display = "none";
+  document.getElementById("grammarQuizStage").style.display = "flex";
+  nextGrammarQ();
+}
+
+function nextGrammarQ() {
+  clearInterval(gQuizInterval);
+  const lesson = GRAMMAR_LESSONS.find(x => x.id === appState.currentGrammarId);
+  if (gQuizIdx >= lesson.quizzes.length) {
+    const id = appState.currentGrammarId;
+    if (id === appState.unlockedGrammarId && appState.unlockedGrammarId < GRAMMAR_LESSONS.length) appState.unlockedGrammarId++;
+    scheduleNextSrs(appState.grammarSrs, id);
+    saveState();
+    alert(`🎉 TUYỆT VỜI! Bạn đã đúng 5/5 câu của ${lesson.title} và mở khóa bài tiếp theo!`);
+    return renderGrammarTab();
+  }
+  const qObj = lesson.quizzes[gQuizIdx];
+  document.getElementById("gQuizProgress").textContent = `${lesson.title} • Câu ${gQuizIdx + 1}/5`;
+  document.getElementById("gQuizPrompt").textContent = qObj.q;
+  document.getElementById("gQuizHint").textContent = `💡 Giải thích: ${qObj.hint}`;
+
+  const box = document.getElementById("gQuizOptions");
+  box.innerHTML = "";
+  qObj.opts.forEach((opt, idx) => {
+    const b = document.createElement("button");
+    b.className = "quiz-opt";
+    b.textContent = opt;
+    b.onclick = () => {
+      clearInterval(gQuizInterval);
+      if (idx !== qObj.ans) {
+        alert(`❌ Chưa đúng! Đáp án là "${qObj.opts[qObj.ans]}".\n(${qObj.hint})`);
+        return renderGrammarTab();
+      }
+      speakEnglish(qObj.q.replace("___", opt));
+      gQuizIdx++;
+      nextGrammarQ();
+    };
+    box.appendChild(b);
+  });
+
+  gQuizTime = 15.0;
+  gQuizInterval = setInterval(() => {
+    gQuizTime = Math.max(0, gQuizTime - 0.1);
+    document.getElementById("gQuizTimerText").textContent = `${gQuizTime.toFixed(1)}s`;
+    document.getElementById("gQuizTimerBar").style.width = `${(gQuizTime / 15.0) * 100}%`;
+    if (gQuizTime <= 0) {
+      clearInterval(gQuizInterval);
+      alert(`⏰ Hết 15 giây! Đáp án đúng là "${qObj.opts[qObj.ans]}".`);
+      renderGrammarTab();
+    }
+  }, 100);
+}
+
+/* ============================================================================
+   PHẦN 9: XỬ LÝ TAB 4 (SPEAKING PHẢN XẠ: ĐỌC -> ĐẾM 5S -> LẬT 5S -> CHUYỂN)
+   ============================================================================ */
+let speakingPoolMode = "learned", speakingDeck = [], speakingIdx = 0, speakingRunning = false, speakingInterval = null;
+
+function buildSpeakingDeck() {
+  const list = [];
+  const maxV = speakingPoolMode === "learned" ? appState.unlockedVocabDay : VOCAB_DAYS.length;
+  const maxG = speakingPoolMode === "learned" ? appState.unlockedGrammarId : GRAMMAR_LESSONS.length;
+
+  VOCAB_DAYS.filter(d => d.day <= maxV).forEach(d => {
+    d.words.forEach(w => list.push({ source: `Từ vựng Ngày ${d.day}`, en: w.chunk, lit: w.lit, vi: w.chunkVi, focus: `${w.w} (${w.ipa})` }));
+  });
+  GRAMMAR_LESSONS.filter(g => g.id <= maxG).forEach(g => {
+    g.patterns.forEach(p => list.push({ source: `Ngữ pháp Bài ${g.id}`, en: p.chunk, lit: p.lit, vi: p.vi, focus: g.title }));
+  });
+  return list.sort(() => Math.random() - 0.5);
+}
+
+function setSpeakingPool(mode) {
+  speakingPoolMode = mode;
+  document.getElementById("spkFilterLearned").classList.toggle("active", mode === "learned");
+  document.getElementById("spkFilterAll").classList.toggle("active", mode === "all");
+  updateSpeakingPoolCount();
+  if (speakingRunning) { speakingDeck = buildSpeakingDeck(); speakingIdx = 0; runSpeakingCycle(); }
+}
+
+function updateSpeakingPoolCount() {
+  speakingDeck = buildSpeakingDeck();
+  document.getElementById("speakingCountInfo").textContent = `${speakingDeck.length} mẫu câu`;
+}
+
+function toggleSpeakingLoop() {
+  speakingRunning ? stopSpeakingLoop() : startSpeakingLoop();
+}
+
+function startSpeakingLoop() {
+  speakingDeck = buildSpeakingDeck();
+  if (!speakingDeck.length) return;
+  speakingRunning = true;
+  speakingIdx = 0;
+  document.getElementById("btnToggleSpeaking").textContent = "⏹ Dừng Lại";
+  runSpeakingCycle();
+}
+
+function stopSpeakingLoop() {
+  speakingRunning = false;
+  clearInterval(speakingInterval);
+  window.speechSynthesis && window.speechSynthesis.cancel();
+  document.getElementById("btnToggleSpeaking").textContent = "▶ Bắt Đầu Tự Động";
+  document.getElementById("spkPhaseTag").textContent = "ĐÃ TẠM DỪNG";
+  document.getElementById("spkCountdownNumber").textContent = "--";
+  document.getElementById("spkTimerBar").style.width = "0%";
+}
+
+function runSpeakingCycle() {
+  if (!speakingRunning) return;
+  clearInterval(speakingInterval);
+  const item = speakingDeck[speakingIdx];
+  const tag = document.getElementById("spkPhaseTag");
+  const disp = document.getElementById("spkMainDisplay");
+  const num = document.getElementById("spkCountdownNumber");
+  const bar = document.getElementById("spkTimerBar");
+
+  tag.className = "status-tag tag-yellow";
+  tag.textContent = `1. ĐANG GỌI ÂM THANH (${item.source})`;
+  num.textContent = "🔊";
+  bar.style.width = "100%";
+  disp.innerHTML = `
+    <div style="font-size:0.85rem; color:var(--text-muted);">Nghe và bật nói câu tiếng Anh tương ứng:</div>
+    <div style="font-size:1.85rem; font-weight:900; color:var(--yellow); margin:8px 0;">"${item.vi}"</div>
+    <div style="font-size:0.88rem; color:var(--text-muted);">Gợi ý: ${item.focus}</div>
+  `;
+
+  speakEnglish(item.en, () => {
+    if (!speakingRunning) return;
+    tag.textContent = "2. ĐẾM NGƯỢC 5 GIÂY — HÃY PHẢN XẠ NÓI TO!";
+    let t = 5.0;
+    speakingInterval = setInterval(() => {
+      if (!speakingRunning) return clearInterval(speakingInterval);
+      t = Math.max(0, t - 0.1);
+      num.textContent = `${Math.ceil(t)}s`;
+      bar.style.width = `${(t / 5.0) * 100}%`;
+      if (t <= 0) {
+        clearInterval(speakingInterval);
+        flipSpeakingResult(item);
+      }
+    }, 100);
+  });
+}
+
+function flipSpeakingResult(item) {
+  if (!speakingRunning) return;
+  const tag = document.getElementById("spkPhaseTag");
+  const disp = document.getElementById("spkMainDisplay");
+  const num = document.getElementById("spkCountdownNumber");
+  const bar = document.getElementById("spkTimerBar");
+
+  tag.className = "status-tag tag-green";
+  tag.textContent = "3. LẬT KẾT QUẢ (GIỮ 5 GIÂY RỒI TỰ CHUYỂN)";
+  disp.innerHTML = `
+    <div class="chunk-box" style="margin:0 auto;">
+      <div class="chunk-en" style="font-size:1.55rem;">✅ ${item.en}</div>
+      <div class="chunk-lit">Dịch từng từ: ${item.lit}</div>
+      <div class="chunk-vi">Nghĩa: ${item.vi}</div>
+    </div>
+  `;
+  speakEnglish(item.en);
+
+  let hold = 5.0;
+  speakingInterval = setInterval(() => {
+    if (!speakingRunning) return clearInterval(speakingInterval);
+    hold = Math.max(0, hold - 0.1);
+    num.textContent = `${Math.ceil(hold)}s`;
+    bar.style.width = `${(hold / 5.0) * 100}%`;
+    if (hold <= 0) {
+      clearInterval(speakingInterval);
+      speakingIdx = (speakingIdx + 1) % speakingDeck.length;
+      runSpeakingCycle();
+    }
+  }, 100);
+}
+
+function replayCurrentSpeakingAudio() {
+  if (!speakingDeck.length) updateSpeakingPoolCount();
+  const item = speakingDeck[speakingIdx] || speakingDeck[0];
+  if (item) speakEnglish(item.en);
+}
+
+function skipToNextSpeakingCard() {
+  if (!speakingDeck.length) updateSpeakingPoolCount();
+  speakingIdx = (speakingIdx + 1) % speakingDeck.length;
+  speakingRunning ? runSpeakingCycle() : startSpeakingLoop();
+}
+
+/* ============================================================================
+   PHẦN 10: BỘ QUẢN LÝ NẠP GÓI TỪ VỰNG OFFLINE (MỞ RỘNG LÊN 1.000 TỪ)
+   ============================================================================ */
+function openDataModal() {
+  updateWordCountUI();
+  document.getElementById("dataModal").classList.add("open");
+}
+
+function closeDataModal() {
+  document.getElementById("dataModal").classList.remove("open");
+}
+
+function importVocabPack() {
+  const raw = document.getElementById("jsonImportBox").value.trim();
+  if (!raw) return alert("Vui lòng dán mã JSON gói từ vựng vào ô trống!");
+  try {
+    const newDays = JSON.parse(raw);
+    if (!Array.isArray(newDays)) throw new Error("Dữ liệu phải là mảng các Ngày từ vựng.");
+    newDays.forEach(nd => {
+      if (nd && nd.day && Array.isArray(nd.words)) {
+        const existIdx = VOCAB_DAYS.findIndex(d => d.day === nd.day);
+        if (existIdx >= 0) VOCAB_DAYS[existIdx] = nd;
+        else VOCAB_DAYS.push(nd);
+      }
+    });
+    VOCAB_DAYS.sort((a, b) => a.day - b.day);
+    localStorage.setItem(CUSTOM_VOCAB_KEY, JSON.stringify(VOCAB_DAYS));
+    document.getElementById("jsonImportBox").value = "";
+    updateWordCountUI();
+    renderVocabTab();
+    updateSpeakingPoolCount();
+    alert(`🎉 Đã nạp thành công! Tổng kho từ Offline hiện tại: ${VOCAB_DAYS.reduce((a,b)=>a+b.words.length,0)} từ (${VOCAB_DAYS.length} ngày).`);
+  } catch (e) {
+    alert("Lỗi định dạng JSON: " + e.message);
+  }
+}
+
+function exportBackup() {
+  const backup = { state: appState, vocabDays: VOCAB_DAYS };
+  document.getElementById("jsonImportBox").value = JSON.stringify(backup);
+  alert("Đã xuất toàn bộ tiến độ và từ vựng ra ô văn bản. Hãy sao chép và cất giữ!");
+}
+
+function importBackup() {
+  const raw = document.getElementById("jsonImportBox").value.trim();
+  if (!raw) return alert("Hãy dán bản sao lưu vào ô trống trước!");
+  try {
+    const data = JSON.parse(raw);
+    if (data.state && data.vocabDays) {
+      appState = data.state;
+      VOCAB_DAYS = data.vocabDays;
+      localStorage.setItem(CUSTOM_VOCAB_KEY, JSON.stringify(VOCAB_DAYS));
+      saveState();
+      updateWordCountUI();
+      renderVocabTab();
+      renderGrammarTab();
+      alert("✓ Đã khôi phục toàn bộ dữ liệu và tiến độ học tập!");
+    }
+  } catch (e) { alert("Bản sao lưu không hợp lệ!"); }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  loadState();
+  updateClockAndSRS();
+  setInterval(updateClockAndSRS, 1000);
+  renderIpaGrid();
+  updateSpeakingPoolCount();
+  checkSpacedRepetitionDue();
+});
+</script>
+</body>
+</html>
